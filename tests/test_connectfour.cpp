@@ -71,6 +71,7 @@ void testAIMove() {
     int chosen = ai.chooseColumn(board, Player::Yellow);
     // AI should choose col 3 to block Red's win!
     assert(chosen == 3);
+    (void)chosen;
     std::cout << "  -> AI blocking OK." << std::endl;
 }
 

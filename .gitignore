@@ -10,8 +10,16 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 
+# Packaging and distribution
+dist/
+release/
+AppDir/
+*.AppImage
+*.dmg
+
 # Log files
 *.log
+logs_*
 
 # Compiled Object files
 *.slo

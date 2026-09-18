@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     app.setOrganizationName("Strategix");
 
     // Load icon if available
-    QIcon icon(":/Quarto.ico");
+    QIcon icon(":/strategix.png");
     if (!icon.isNull()) {
         app.setWindowIcon(icon);
     }

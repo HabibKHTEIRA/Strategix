@@ -28,6 +28,7 @@ void testWallPlacementAndBlocking() {
     assert(board.canPlaceWall(w));
     bool placed = board.placeWall(w);
     assert(placed);
+    (void)placed;
     assert(board.walls().size() == 1);
 
     // Player 1 at (8, 4) cannot move directly north to (7, 4)
@@ -56,6 +57,7 @@ void testPawnMoveAndJump() {
         if (m == Position({2, 4})) foundJump = true;
     }
     assert(foundJump);
+    (void)foundJump;
     std::cout << "  -> Pawn jump OK." << std::endl;
 }
 

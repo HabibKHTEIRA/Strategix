@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Strategix
+Comment=Suite de jeux de stratégie
+Exec=strategix
+Icon=strategix
+Categories=Game;BoardGame;
+Terminal=false

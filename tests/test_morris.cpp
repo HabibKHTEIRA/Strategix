@@ -48,6 +48,7 @@ void testGameFlow() {
     assert(game.currentPhase(Piece::White) == GamePhase::Placing);
     bool ok = game.placePiece(0);
     assert(ok);
+    (void)ok;
     assert(game.whiteUnplaced() == 8);
     assert(game.activePlayer() == Piece::Black);
     std::cout << "  -> Game flow OK." << std::endl;

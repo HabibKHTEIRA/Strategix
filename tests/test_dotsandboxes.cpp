@@ -55,6 +55,7 @@ void testAI() {
     assert(chosen.has_value());
     // AI must choose the completing edge V(0, 1)
     assert(chosen->type == EdgeType::Vertical && chosen->row == 0 && chosen->col == 1);
+    (void)chosen;
     std::cout << "  -> AI capture OK." << std::endl;
 }
 

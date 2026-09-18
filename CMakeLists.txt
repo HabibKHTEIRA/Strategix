@@ -148,6 +148,22 @@ target_link_libraries(strategix PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
 )
 
+if(WIN32)
+    set_target_properties(strategix PROPERTIES
+        QT_WINDOWS_APP_PROJECT_IDENTIFIER "com.strategix.game"
+    )
+endif()
+
+if(APPLE)
+    set_target_properties(strategix PROPERTIES
+        OUTPUT_NAME "Strategix"
+        MACOSX_BUNDLE_BUNDLE_NAME "Strategix"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.strategix.game"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+    )
+endif()
+
 if(MSVC)
     target_compile_options(strategix PRIVATE /W4)
 else()

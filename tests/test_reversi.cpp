@@ -26,6 +26,7 @@ void testFlipping() {
     // Black plays at (2, 3) bracketing White at (3, 3) against Black at (4, 3)
     int flipped = board.applyMove(2, 3, Piece::Black);
     assert(flipped == 1);
+    (void)flipped;
     assert(board.pieceAt(2, 3) == Piece::Black);
     assert(board.pieceAt(3, 3) == Piece::Black); // Was white, now black
     assert(board.blackCount() == 4);
@@ -39,12 +40,14 @@ void testGameFlowAndAI() {
     assert(game.activePlayer() == Piece::Black);
     bool ok = game.playMove(2, 3);
     assert(ok);
+    (void)ok;
     assert(game.activePlayer() == Piece::White);
 
     ReversiAI ai(AIDifficulty::Medium);
     auto aiMove = ai.chooseMove(game.board(), Piece::White);
     assert(aiMove.has_value());
     assert(game.board().isValidMove(aiMove->row, aiMove->col, Piece::White));
+    (void)aiMove;
     std::cout << "  -> Game flow and AI OK." << std::endl;
 }
 
