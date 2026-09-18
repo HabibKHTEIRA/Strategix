@@ -199,61 +199,6 @@ jobs:
 
 
   # ============================================================
-  # MACOS
-  # ============================================================
-  macos:
-    name: macOS
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: "6.8.*"
-          arch: "clang_64"
-          cache: true
-
-      - name: Configure
-        run: |
-          cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
-
-      - name: Build
-        run: |
-          cmake --build build \
-            --parallel
-
-      - name: Run tests
-        run: |
-          ctest \
-            --test-dir build \
-            --output-on-failure
-
-      - name: Deploy Qt frameworks
-        run: |
-          cd build
-
-          macdeployqt \
-            Strategix.app \
-            -dmg
-
-      - name: Prepare artifact
-        run: |
-          mkdir -p release
-          find build -name "*.dmg" -exec mv {} release/Strategix-macOS-universal.dmg \;
-
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Strategix-macOS
-          path: release/Strategix-macOS-universal.dmg
-
-
-  # ============================================================
   # GITHUB RELEASE
   # ============================================================
   release:
@@ -264,7 +209,6 @@ jobs:
     needs:
       - windows
       - linux
-      - macos
 
     runs-on: ubuntu-latest
 

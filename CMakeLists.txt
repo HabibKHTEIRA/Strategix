@@ -124,7 +124,6 @@ set(UI_SOURCES
 # Main Application Executable
 add_executable(strategix
     WIN32
-    MACOSX_BUNDLE
 
     src/main.cpp
 
@@ -151,16 +150,6 @@ target_link_libraries(strategix PRIVATE
 if(WIN32)
     set_target_properties(strategix PROPERTIES
         QT_WINDOWS_APP_PROJECT_IDENTIFIER "com.strategix.game"
-    )
-endif()
-
-if(APPLE)
-    set_target_properties(strategix PROPERTIES
-        OUTPUT_NAME "Strategix"
-        MACOSX_BUNDLE_BUNDLE_NAME "Strategix"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "com.strategix.game"
-        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
     )
 endif()
 

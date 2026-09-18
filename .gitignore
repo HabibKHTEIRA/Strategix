@@ -15,7 +15,6 @@ dist/
 release/
 AppDir/
 *.AppImage
-*.dmg
 
 # Log files
 *.log
