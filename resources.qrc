@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Quarto.ico</file>
+        <file>Quarto.jpg</file>
+        <file>src/style/style.qss</file>
+        <file>img/40-pions-en-bois-pour-jeu-de-dames-35-cm-moulures-dans-coffret-bois.webp</file>
+        <file>img/go.webp</file>
+        <file>img/Quoridor.webp</file>
+        <file>img/connect_four.webp</file>
+        <file>img/reversi.webp</file>
+        <file>img/nine_mens_morris.webp</file>
+        <file>img/dot_and_boxes.webp</file>
+    </qresource>
+</RCC>
+

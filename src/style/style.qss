@@ -1,0 +1,129 @@
+/* Modern Minimalist Dark Stylesheet for Strategix */
+
+QMainWindow {
+    background-color: #141416;
+    color: #F4F4F5;
+}
+
+QWidget {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    color: #F4F4F5;
+}
+
+QToolBar {
+    background-color: #1C1C1F;
+    border-bottom: 1px solid #2C2C30;
+    padding: 6px 12px;
+    spacing: 8px;
+}
+
+/* ToolBar and General Buttons */
+QPushButton {
+    background-color: #27272A;
+    color: #F4F4F5;
+    border: 1px solid #3F3F46;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background-color: #3F3F46;
+    border-color: #71717A;
+    color: #FFFFFF;
+}
+
+QPushButton:pressed {
+    background-color: #1C1C1F;
+}
+
+QPushButton:disabled {
+    background-color: #18181B;
+    color: #52525B;
+    border-color: #27272A;
+}
+
+/* ComboBox */
+QComboBox {
+    background-color: #27272A;
+    color: #F4F4F5;
+    border: 1px solid #3F3F46;
+    border-radius: 6px;
+    padding: 5px 12px;
+    min-width: 120px;
+}
+
+QComboBox:hover {
+    border-color: #71717A;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #1F1F23;
+    color: #F4F4F5;
+    border: 1px solid #3F3F46;
+    selection-background-color: #2E2E34;
+    selection-color: #FFFFFF;
+    padding: 4px;
+}
+
+/* Status Banner */
+#statusBanner {
+    background-color: #1F1F23;
+    border: 1px solid #2C2C30;
+    border-radius: 10px;
+}
+
+/* TabWidget */
+QTabWidget::pane {
+    border: 1px solid #2C2C30;
+    background-color: #18181B;
+    border-radius: 8px;
+}
+
+QTabBar::tab {
+    background-color: #202024;
+    color: #A1A1AA;
+    padding: 8px 18px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin-right: 4px;
+}
+
+QTabBar::tab:selected {
+    background-color: #2C2C30;
+    color: #F4F4F5;
+    font-weight: bold;
+}
+
+/* TextBrowser for Rules & About */
+QTextBrowser {
+    background-color: #18181B;
+    border: 1px solid #2C2C30;
+    border-radius: 8px;
+    color: #E4E4E7;
+    padding: 14px;
+}
+
+/* ScrollBars */
+QScrollBar:vertical {
+    border: none;
+    background-color: #18181B;
+    width: 8px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #3F3F46;
+    min-height: 20px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #71717A;
+}
