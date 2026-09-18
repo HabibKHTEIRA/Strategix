@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>Quarto.ico</file>
         <file>strategix.png</file>
         <file>src/style/style.qss</file>
         <file>img/40-pions-en-bois-pour-jeu-de-dames-35-cm-moulures-dans-coffret-bois.webp</file>
