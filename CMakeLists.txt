@@ -123,7 +123,11 @@ set(UI_SOURCES
 
 # Main Application Executable
 add_executable(strategix
+    WIN32
+    MACOSX_BUNDLE
+
     src/main.cpp
+
     ${LOCALIZATION_SOURCES}
     ${CHECKERS_CORE_SOURCES}
     ${GO_CORE_SOURCES}
@@ -133,6 +137,7 @@ add_executable(strategix
     ${MORRIS_CORE_SOURCES}
     ${DOTSANDBOXES_CORE_SOURCES}
     ${UI_SOURCES}
+
     resources.qrc
 )
 
