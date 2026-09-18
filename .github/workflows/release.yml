@@ -1,0 +1,281 @@
+name: Build Strategix
+
+on:
+  workflow_dispatch:
+
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+
+  # ============================================================
+  # WINDOWS
+  # ============================================================
+  windows:
+    name: Windows
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.*"
+          arch: "win64_msvc2022_64"
+          cache: true
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S . -B build `
+            -G "Visual Studio 17 2022" `
+            -A x64
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build build `
+            --config Release `
+            --parallel
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          ctest `
+            --test-dir build `
+            -C Release `
+            --output-on-failure
+
+      - name: Prepare application folder
+        shell: pwsh
+        run: |
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path dist/windows/Strategix
+
+          Copy-Item `
+            build/Release/strategix.exe `
+            dist/windows/Strategix/strategix.exe
+
+      - name: Deploy Qt libraries
+        shell: pwsh
+        run: |
+          windeployqt `
+            --release `
+            --no-translations `
+            dist/windows/Strategix/strategix.exe
+
+      - name: Download Visual C++ Redistributable
+        shell: pwsh
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" `
+            -OutFile "dist/windows/vc_redist.x64.exe"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+
+      - name: Create Windows installer
+        shell: pwsh
+        run: |
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path release
+
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "packaging/windows/strategix.iss"
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Strategix-Windows
+          path: release/Strategix-Windows-x64-Setup.exe
+
+
+  # ============================================================
+  # LINUX
+  # ============================================================
+  linux:
+    name: Linux
+    runs-on: ubuntu-24.04
+
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+      LDAI_OUTPUT: "Strategix-Linux-x86_64.AppImage"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.*"
+          arch: "linux_gcc_64"
+          cache: true
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build \
+            --parallel
+
+      - name: Run tests
+        run: |
+          ctest \
+            --test-dir build \
+            --output-on-failure
+
+      - name: Download linuxdeploy
+        run: |
+          wget -q \
+            https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage \
+            -O linuxdeploy-x86_64.AppImage
+
+          wget -q \
+            https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage \
+            -O linuxdeploy-plugin-qt-x86_64.AppImage
+
+          chmod +x linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
+
+      - name: Prepare AppDir
+        run: |
+          mkdir -p AppDir/usr/bin
+
+          cp build/strategix \
+            AppDir/usr/bin/strategix
+
+      - name: Create AppImage
+        run: |
+          export QMAKE="$(which qmake6 || which qmake)"
+
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir AppDir \
+            --executable AppDir/usr/bin/strategix \
+            --desktop-file packaging/linux/strategix.desktop \
+            --icon-file strategix.png \
+            --plugin qt \
+            --output appimage
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p release
+
+          mv Strategix-Linux-x86_64.AppImage \
+            release/Strategix-Linux-x86_64.AppImage
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Strategix-Linux
+          path: release/Strategix-Linux-x86_64.AppImage
+
+
+  # ============================================================
+  # MACOS
+  # ============================================================
+  macos:
+    name: macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.*"
+          arch: "clang_64"
+          cache: true
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+
+      - name: Build
+        run: |
+          cmake --build build \
+            --parallel
+
+      - name: Run tests
+        run: |
+          ctest \
+            --test-dir build \
+            --output-on-failure
+
+      - name: Deploy Qt frameworks
+        run: |
+          cd build
+
+          macdeployqt \
+            Strategix.app \
+            -dmg
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p release
+
+          mv build/Strategix.dmg \
+            release/Strategix-macOS-universal.dmg
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Strategix-macOS
+          path: release/Strategix-macOS-universal.dmg
+
+
+  # ============================================================
+  # GITHUB RELEASE
+  # ============================================================
+  release:
+    name: Publish GitHub Release
+
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs:
+      - windows
+      - linux
+      - macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download generated files
+        uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Show generated files
+        run: |
+          ls -lah release
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create \
+            "${GITHUB_REF_NAME}" \
+            release/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "Strategix ${GITHUB_REF_NAME}" \
+            --generate-notes
