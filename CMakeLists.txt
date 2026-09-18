@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(Strategix
-    VERSION 2.0.0
-    DESCRIPTION "Plateforme de jeux de stratégie (Dames & Go) en C++17 et Qt avec IA et multilinguisme"
+    VERSION 2.0.1
+    DESCRIPTION "Plateforme de jeux de stratégie en C++17 et Qt avec IA et multilinguisme"
     LANGUAGES CXX
 )
 

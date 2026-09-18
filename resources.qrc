@@ -3,13 +3,13 @@
         <file>Quarto.ico</file>
         <file>strategix.png</file>
         <file>src/style/style.qss</file>
-        <file>img/40-pions-en-bois-pour-jeu-de-dames-35-cm-moulures-dans-coffret-bois.webp</file>
-        <file>img/go.webp</file>
-        <file>img/Quoridor.webp</file>
-        <file>img/connect_four.webp</file>
-        <file>img/reversi.webp</file>
-        <file>img/nine_mens_morris.webp</file>
-        <file>img/dot_and_boxes.webp</file>
+        <file>img/dames.png</file>
+        <file>img/go.png</file>
+        <file>img/connect_four.png</file>
+        <file>img/reversi.png</file>
+        <file>img/quoridor.png</file>
+        <file>img/nine_mens_morris.png</file>
+        <file>img/dot_and_boxes.png</file>
     </qresource>
 </RCC>
 

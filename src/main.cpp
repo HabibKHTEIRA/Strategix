@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("Strategix");
     app.setApplicationDisplayName("Strategix - Board Games");
-    app.setApplicationVersion("2.0.0");
+    app.setApplicationVersion("2.0.1");
     app.setOrganizationName("Strategix");
 
     // Load icon if available

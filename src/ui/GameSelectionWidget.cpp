@@ -72,19 +72,19 @@ GameSelectionWidget::GameSelectionWidget(QWidget *parent)
     row0Layout->setSpacing(16);
 
     row0Layout->addWidget(createGameCard("game_checkers", "game_checkers_desc",
-        ":/img/40-pions-en-bois-pour-jeu-de-dames-35-cm-moulures-dans-coffret-bois.webp",
+        ":/img/dames.png",
         "#71717A", &GameSelectionWidget::checkersSelected));
 
     row0Layout->addWidget(createGameCard("game_go", "game_go_desc",
-        ":/img/go.webp",
+        ":/img/go.png",
         "#71717A", &GameSelectionWidget::goSelected));
 
     row0Layout->addWidget(createGameCard("game_connectfour", "game_connectfour_desc",
-        ":/img/connect_four.webp",
+        ":/img/connect_four.png",
         "#71717A", &GameSelectionWidget::connectFourSelected));
 
     row0Layout->addWidget(createGameCard("game_reversi", "game_reversi_desc",
-        ":/img/reversi.webp",
+        ":/img/reversi.png",
         "#71717A", &GameSelectionWidget::reversiSelected));
 
     rootLayout->addLayout(row0Layout);
@@ -95,15 +95,15 @@ GameSelectionWidget::GameSelectionWidget(QWidget *parent)
     row1Layout->setSpacing(16);
 
     row1Layout->addWidget(createGameCard("game_quoridor", "game_quoridor_desc",
-        ":/img/Quoridor.webp",
+        ":/img/quoridor.png",
         "#71717A", &GameSelectionWidget::quoridorSelected));
 
     row1Layout->addWidget(createGameCard("game_morris", "game_morris_desc",
-        ":/img/nine_mens_morris.webp",
+        ":/img/nine_mens_morris.png",
         "#71717A", &GameSelectionWidget::morrisSelected));
 
     row1Layout->addWidget(createGameCard("game_dotsandboxes", "game_dotsandboxes_desc",
-        ":/img/dot_and_boxes.webp",
+        ":/img/dot_and_boxes.png",
         "#71717A", &GameSelectionWidget::dotsAndBoxesSelected));
 
     rootLayout->addLayout(row1Layout);
