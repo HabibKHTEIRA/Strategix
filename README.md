@@ -2,7 +2,7 @@
 
 Stratégix est une application de bureau multiplateforme regroupant **7 jeux de réflexion et de stratégie combinatoire**, développée en **C++17** et **Qt (compatible Qt 6 et Qt 5)** avec une architecture MVC modulaire et un design minimaliste épuré.
 
-![Menu Principal - Stratégix](strategix.png)
+![Menu Principal - Stratégix](im/capture.png)
 
 ---
 
