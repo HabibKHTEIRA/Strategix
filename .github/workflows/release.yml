@@ -2,6 +2,11 @@ name: Build Strategix
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Nom du tag de release (ex: v2.0.0)'
+        required: false
+        default: 'v2.0.0'
 
   push:
     tags:
@@ -140,6 +145,11 @@ jobs:
             --test-dir build \
             --output-on-failure
 
+      - name: Install FUSE
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2t64 || sudo apt-get install -y libfuse2
+
       - name: Download linuxdeploy
         run: |
           wget -q \
@@ -162,7 +172,10 @@ jobs:
 
       - name: Create AppImage
         run: |
-          export QMAKE="$(which qmake6 || which qmake)"
+          export QMAKE="${QT_ROOT_DIR}/bin/qmake"
+          if [ ! -f "$QMAKE" ]; then
+            export QMAKE="$(which qmake6 || which qmake)"
+          fi
 
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
@@ -176,8 +189,7 @@ jobs:
         run: |
           mkdir -p release
 
-          mv Strategix-Linux-x86_64.AppImage \
-            release/Strategix-Linux-x86_64.AppImage
+          mv Strategix*.AppImage release/Strategix-Linux-x86_64.AppImage
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -232,9 +244,7 @@ jobs:
       - name: Prepare artifact
         run: |
           mkdir -p release
-
-          mv build/Strategix.dmg \
-            release/Strategix-macOS-universal.dmg
+          find build -name "*.dmg" -exec mv {} release/Strategix-macOS-universal.dmg \;
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
@@ -249,7 +259,7 @@ jobs:
   release:
     name: Publish GitHub Release
 
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     needs:
       - windows
@@ -273,9 +283,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          TAG_NAME="${{ inputs.tag_name }}"
+          if [ -z "$TAG_NAME" ] || [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            TAG_NAME="${GITHUB_REF_NAME}"
+          fi
           gh release create \
-            "${GITHUB_REF_NAME}" \
+            "${TAG_NAME}" \
             release/* \
             --repo "${GITHUB_REPOSITORY}" \
-            --title "Strategix ${GITHUB_REF_NAME}" \
+            --title "Strategix ${TAG_NAME}" \
             --generate-notes
