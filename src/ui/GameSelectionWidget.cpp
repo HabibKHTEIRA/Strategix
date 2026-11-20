@@ -106,6 +106,10 @@ GameSelectionWidget::GameSelectionWidget(QWidget *parent)
         ":/img/dot_and_boxes.png",
         "#71717A", &GameSelectionWidget::dotsAndBoxesSelected));
 
+    row1Layout->addWidget(createGameCard("game_monopoly", "game_monopoly_desc",
+        ":/img/monopoly.png",
+        "#D4AF37", &GameSelectionWidget::monopolySelected));
+
     rootLayout->addLayout(row1Layout);
 
     setDarkMode(true);

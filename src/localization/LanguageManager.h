@@ -35,6 +35,7 @@ public:
     QString gameNameQuoridor() const;
     QString gameNameMorris() const;
     QString gameNameDotsAndBoxes() const;
+    QString gameNameMonopoly() const;
 
     QString rulesCheckersHtml() const;
     QString rulesGoHtml() const;
@@ -43,6 +44,7 @@ public:
     QString rulesQuoridorHtml() const;
     QString rulesMorrisHtml() const;
     QString rulesDotsAndBoxesHtml() const;
+    QString rulesMonopolyHtml() const;
     QString aboutHtml() const;
 
 signals:

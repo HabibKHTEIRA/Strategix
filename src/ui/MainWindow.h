@@ -23,6 +23,8 @@
 #include "../core/morris/MorrisAI.h"
 #include "../core/dotsandboxes/DotsAndBoxesGame.h"
 #include "../core/dotsandboxes/DotsAndBoxesAI.h"
+#include "../core/monopoly/MonopolyGame.h"
+#include "../core/monopoly/MonopolyAI.h"
 
 #include "GameSelectionWidget.h"
 #include "checkers/CheckersWidget.h"
@@ -32,6 +34,7 @@
 #include "quoridor/QuoridorWidget.h"
 #include "morris/MorrisWidget.h"
 #include "dotsandboxes/DotsAndBoxesWidget.h"
+#include "monopoly/MonopolyWidget.h"
 
 namespace Strategix {
 
@@ -50,6 +53,7 @@ public slots:
     void startQuoridor();
     void startMorris();
     void startDotsAndBoxes();
+    void startMonopoly();
     void onLanguageChanged(Language lang);
 
 private slots:
@@ -110,7 +114,8 @@ private:
         Reversi,
         Quoridor,
         Morris,
-        DotsAndBoxes
+        DotsAndBoxes,
+        Monopoly
     };
     ActiveGame m_activeGame = ActiveGame::None;
 
@@ -135,6 +140,9 @@ private:
 
     DotsAndBoxes::DotsAndBoxesGame m_dbGame;
     DotsAndBoxes::DotsAndBoxesAI m_dbAI;
+
+    Monopoly::MonopolyGame m_monopolyGame;
+    Monopoly::MonopolyAI m_monopolyAI;
 
     // UI Widgets
     QStackedWidget *m_stackedWidget;
@@ -182,6 +190,10 @@ private:
     DotsAndBoxes::DotsAndBoxesWidget *m_dbWidget;
     QLabel *m_dbStatusLabel;
     QLabel *m_dbScoreLabel;
+
+    // Monopoly UI
+    QWidget *m_monopolyContainer;
+    Monopoly::MonopolyWidget *m_monopolyWidget;
 
     // Toolbar controls
     QPushButton *m_homeBtn;

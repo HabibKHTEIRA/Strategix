@@ -43,6 +43,10 @@ RulesDialog::RulesDialog(int initialTab, QWidget *parent)
     m_dotsAndBoxesBrowser->setOpenExternalLinks(true);
     m_tabs->addTab(m_dotsAndBoxesBrowser, "");
 
+    m_monopolyBrowser = new QTextBrowser(this);
+    m_monopolyBrowser->setOpenExternalLinks(true);
+    m_tabs->addTab(m_monopolyBrowser, "");
+
     m_tabs->setCurrentIndex(initialTab);
     layout->addWidget(m_tabs);
 
@@ -65,6 +69,7 @@ void RulesDialog::updateTexts() {
     m_tabs->setTabText(4, trText("game_quoridor"));
     m_tabs->setTabText(5, trText("game_morris"));
     m_tabs->setTabText(6, trText("game_dotsandboxes"));
+    m_tabs->setTabText(7, trText("game_monopoly"));
 
     m_checkersBrowser->setHtml(LanguageManager::instance().rulesCheckersHtml());
     m_goBrowser->setHtml(LanguageManager::instance().rulesGoHtml());
@@ -73,6 +78,7 @@ void RulesDialog::updateTexts() {
     m_quoridorBrowser->setHtml(LanguageManager::instance().rulesQuoridorHtml());
     m_morrisBrowser->setHtml(LanguageManager::instance().rulesMorrisHtml());
     m_dotsAndBoxesBrowser->setHtml(LanguageManager::instance().rulesDotsAndBoxesHtml());
+    m_monopolyBrowser->setHtml(LanguageManager::instance().rulesMonopolyHtml());
 
     QPushButton *closeBtn = findChild<QPushButton*>("closeRulesBtn");
     if (closeBtn) {

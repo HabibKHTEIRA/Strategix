@@ -24,6 +24,7 @@ private:
     QTextBrowser *m_quoridorBrowser;
     QTextBrowser *m_morrisBrowser;
     QTextBrowser *m_dotsAndBoxesBrowser;
+    QTextBrowser *m_monopolyBrowser;
 };
 
 } // namespace Strategix

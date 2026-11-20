@@ -118,6 +118,7 @@ void MainWindow::setupUI() {
     connect(m_homeWidget, &GameSelectionWidget::quoridorSelected, this, &MainWindow::startQuoridor);
     connect(m_homeWidget, &GameSelectionWidget::morrisSelected, this, &MainWindow::startMorris);
     connect(m_homeWidget, &GameSelectionWidget::dotsAndBoxesSelected, this, &MainWindow::startDotsAndBoxes);
+    connect(m_homeWidget, &GameSelectionWidget::monopolySelected, this, &MainWindow::startMonopoly);
     m_stackedWidget->addWidget(m_homeWidget);
 
     // 1. Checkers Screen
@@ -276,6 +277,18 @@ void MainWindow::setupUI() {
     dbLayout->addWidget(m_dbWidget, 1, Qt::AlignCenter);
     m_stackedWidget->addWidget(m_dbContainer);
 
+    // 8. Monopoly Screen (Full container space so board fills entire area cleanly)
+    m_monopolyContainer = new QWidget(this);
+    QVBoxLayout *monoLayout = new QVBoxLayout(m_monopolyContainer);
+    monoLayout->setContentsMargins(0, 0, 0, 0);
+    monoLayout->setSpacing(0);
+    m_monopolyWidget = new Monopoly::MonopolyWidget(m_monopolyContainer);
+    m_monopolyWidget->setGame(&m_monopolyGame, &m_monopolyAI);
+    connect(m_monopolyWidget, &Monopoly::MonopolyWidget::backToHomeRequested, this, &MainWindow::showHome);
+    connect(m_monopolyWidget, &Monopoly::MonopolyWidget::gameStateUpdated, this, &MainWindow::updateUI);
+    monoLayout->addWidget(m_monopolyWidget, 1);
+    m_stackedWidget->addWidget(m_monopolyContainer);
+
     rootLayout->addWidget(m_stackedWidget);
 }
 
@@ -359,6 +372,18 @@ void MainWindow::startDotsAndBoxes() {
     onNewGame();
 }
 
+void MainWindow::startMonopoly() {
+    m_activeGame = ActiveGame::Monopoly;
+    m_stackedWidget->setCurrentIndex(8);
+    m_newGameBtn->setVisible(true);
+    m_undoBtn->setVisible(true);
+    m_modeCombo->setVisible(true);
+    m_diffCombo->setVisible(true);
+    m_monopolyWidget->setDarkMode(m_isDarkMode);
+    m_monopolyWidget->showLobbySetup();
+    updateUI();
+}
+
 void MainWindow::onNewGame() {
     bool isAI = (m_modeCombo->currentIndex() == 1);
     int diffIdx = m_diffCombo->currentIndex();
@@ -406,6 +431,12 @@ void MainWindow::onNewGame() {
         m_dbAI.setDifficulty(diff);
         m_dbGame.startNewGame(mode, diff);
         m_dbWidget->setLastEdge(std::nullopt);
+    } else if (m_activeGame == ActiveGame::Monopoly) {
+        auto mode = isAI ? Monopoly::GameMode::PlayerVsAI : Monopoly::GameMode::TwoPlayers;
+        auto diff = static_cast<Monopoly::AIDifficulty>(diffIdx);
+        m_monopolyAI.setDifficulty(diff);
+        m_monopolyWidget->syncFromMainWindowToolbar(mode, diff);
+        m_monopolyWidget->onExternalNewGame();
     }
 
     updateUI();
@@ -420,6 +451,7 @@ void MainWindow::onUndo() {
         case ActiveGame::Quoridor: m_quoridorGame.undo(); break;
         case ActiveGame::Morris: m_morrisGame.undo(); break;
         case ActiveGame::DotsAndBoxes: m_dbGame.undo(); break;
+        case ActiveGame::Monopoly: m_monopolyGame.undo(); m_monopolyWidget->update(); break;
         default: break;
     }
     updateUI();
@@ -445,6 +477,12 @@ void MainWindow::onDifficultyChanged() {
         m_morrisAI.setDifficulty(static_cast<Morris::AIDifficulty>(diffIdx));
     } else if (m_activeGame == ActiveGame::DotsAndBoxes) {
         m_dbAI.setDifficulty(static_cast<DotsAndBoxes::AIDifficulty>(diffIdx));
+    } else if (m_activeGame == ActiveGame::Monopoly) {
+        bool isAI = (m_modeCombo->currentIndex() == 1);
+        auto mode = isAI ? Monopoly::GameMode::PlayerVsAI : Monopoly::GameMode::TwoPlayers;
+        auto diff = static_cast<Monopoly::AIDifficulty>(diffIdx);
+        m_monopolyAI.setDifficulty(diff);
+        m_monopolyWidget->syncFromMainWindowToolbar(mode, diff);
     }
 }
 
@@ -954,6 +992,10 @@ void MainWindow::updateUI() {
                                     .arg(trText("red")).arg(m_dbGame.player2Score()));
         m_undoBtn->setEnabled(m_dbGame.canUndo() && !m_dbGame.isAITurn());
     }
+    else if (m_activeGame == ActiveGame::Monopoly) {
+        m_undoBtn->setEnabled(m_monopolyGame.canUndo() && !m_monopolyGame.isAITurn());
+        m_monopolyWidget->update();
+    }
 }
 
 void MainWindow::updateTexts() {
@@ -1026,6 +1068,9 @@ void MainWindow::applyTheme() {
         qApp->setStyleSheet(lightStyle);
     }
     m_homeWidget->setDarkMode(m_isDarkMode);
+    if (m_monopolyWidget) {
+        m_monopolyWidget->setDarkMode(m_isDarkMode);
+    }
 }
 
 void MainWindow::onLanguageChanged(Language /*lang*/) {
@@ -1042,6 +1087,7 @@ void MainWindow::onShowRules() {
         case ActiveGame::Quoridor: tab = 4; break;
         case ActiveGame::Morris: tab = 5; break;
         case ActiveGame::DotsAndBoxes: tab = 6; break;
+        case ActiveGame::Monopoly: tab = 7; break;
         default: tab = 0; break;
     }
     RulesDialog dlg(tab, this);

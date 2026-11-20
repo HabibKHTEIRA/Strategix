@@ -24,6 +24,7 @@ signals:
     void quoridorSelected();
     void morrisSelected();
     void dotsAndBoxesSelected();
+    void monopolySelected();
 
 private:
     QWidget* createGameCard(const QString& titleKey, const QString& descKey,

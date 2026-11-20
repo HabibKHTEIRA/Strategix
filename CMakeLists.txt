@@ -95,6 +95,16 @@ set(DOTSANDBOXES_CORE_SOURCES
     src/core/dotsandboxes/DotsAndBoxesAI.cpp
 )
 
+# Monopoly core sources
+set(MONOPOLY_CORE_SOURCES
+    src/core/monopoly/MonopolyBoard.h
+    src/core/monopoly/MonopolyBoard.cpp
+    src/core/monopoly/MonopolyGame.h
+    src/core/monopoly/MonopolyGame.cpp
+    src/core/monopoly/MonopolyAI.h
+    src/core/monopoly/MonopolyAI.cpp
+)
+
 # UI sources
 set(UI_SOURCES
     src/ui/GameSelectionWidget.h
@@ -113,6 +123,8 @@ set(UI_SOURCES
     src/ui/morris/MorrisWidget.cpp
     src/ui/dotsandboxes/DotsAndBoxesWidget.h
     src/ui/dotsandboxes/DotsAndBoxesWidget.cpp
+    src/ui/monopoly/MonopolyWidget.h
+    src/ui/monopoly/MonopolyWidget.cpp
     src/ui/dialogs/RulesDialog.h
     src/ui/dialogs/RulesDialog.cpp
     src/ui/dialogs/AboutDialog.h
@@ -135,6 +147,7 @@ add_executable(strategix
     ${QUORIDOR_CORE_SOURCES}
     ${MORRIS_CORE_SOURCES}
     ${DOTSANDBOXES_CORE_SOURCES}
+    ${MONOPOLY_CORE_SOURCES}
     ${UI_SOURCES}
 
     resources.qrc
@@ -238,4 +251,15 @@ if(NOT MSVC)
     target_compile_options(test_dotsandboxes PRIVATE -Wall -Wextra)
 endif()
 add_test(NAME DotsAndBoxesTests COMMAND test_dotsandboxes)
+
+# Test Monopoly
+add_executable(test_monopoly
+    tests/test_monopoly.cpp
+    ${MONOPOLY_CORE_SOURCES}
+)
+target_include_directories(test_monopoly PRIVATE src)
+if(NOT MSVC)
+    target_compile_options(test_monopoly PRIVATE -Wall -Wextra)
+endif()
+add_test(NAME MonopolyTests COMMAND test_monopoly)
 

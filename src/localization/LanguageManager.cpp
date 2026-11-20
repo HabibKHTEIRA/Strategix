@@ -63,6 +63,10 @@ QString LanguageManager::gameNameDotsAndBoxes() const {
     return get("game_dotsandboxes");
 }
 
+QString LanguageManager::gameNameMonopoly() const {
+    return get("game_monopoly");
+}
+
 void LanguageManager::initTranslations() {
     auto add = [this](const std::string& key, const QString& fr, const QString& en, const QString& ar) {
         m_dict[key][static_cast<int>(Language::French)] = fr;
@@ -168,6 +172,444 @@ void LanguageManager::initTranslations() {
     add("blue", "Bleu", "Blue", "أزرق");
     add("boxes", "Cases fermées", "Boxes closed", "المربعات المغلقة");
     add("bonus_turn", "Case fermée ! Vous rejouez !", "Box closed! Bonus turn!", "مربع مغلق! دور إضافي لك!");
+
+    // Monopoly - General & Setup
+    add("game_monopoly", "Monopoly", "Monopoly", "مونوبولي (بنك الحظ)");
+    add("game_monopoly_desc", "Achetez, vendez et négociez les avenues de Paris dans une édition moderne Noir & Or.",
+        "Buy, sell, and trade iconic Parisian avenues in a modern Black & Gold edition.",
+        "اشترِ وبِع وتفاوض على أشهر شوارع باريس في إصدار عصري بالأسود والذهبي.");
+    add("mono_motto", "❖ Achetez. Vendez. Négociez. Gagnez ! ❖", "❖ Buy. Sell. Trade. Win! ❖", "❖ اشترِ. بِع. تفاوض. اربح! ❖");
+    add("mono_new_game_btn", "N. PARTIE", "NEW GAME", "لعبة جديدة");
+    add("mono_back", "RETOUR", "BACK", "رجوع");
+    add("mono_rules_btn", "RÈGLES", "RULES", "القواعد");
+    add("mono_add_player", "AJOUTER JOUEUR", "ADD PLAYER", "إضافة لاعب");
+    add("mono_remove_player", "SUPPRIMER", "REMOVE", "حذف");
+    add("mono_play_btn", "JOUER", "PLAY", "العب");
+    add("mono_close_btn", "FERMER", "CLOSE", "إغلاق");
+    add("mono_human_player", "JOUEUR HUMAIN", "HUMAN PLAYER", "لاعب بشري");
+    add("mono_computer_player", "ORDINATEUR", "COMPUTER", "الكمبيوتر");
+    add("mono_choose_diff", "Choisissez la difficulté", "Choose difficulty", "اختر مستوى الصعوبة");
+    add("mono_diff_easy", "AGENT IMMOBILIER", "REAL ESTATE AGENT", "وكيل عقاري");
+    add("mono_diff_medium", "ENTREPRENEUR", "ENTREPRENEUR", "مقاول");
+    add("mono_diff_hard", "MAGNAT DE L'IMMOBILIER", "REAL ESTATE TYCOON", "قطب العقارات");
+    add("mono_click_token_hint", "Cliquez sur l'icône d'un pion pour choisir votre propre pion.",
+        "Click on a token icon to choose your own token.",
+        "انقر على أيقونة البيدق لاختيار القطعة الخاصة بك.");
+    add("mono_choose_token_title", "CHOISISSEZ UN PION", "CHOOSE A TOKEN", "اختر بيدقاً");
+    add("mono_free_tokens", "PIONS DISPONIBLES", "AVAILABLE TOKENS", "البيادق المتاحة");
+    add("mono_player_default", "Joueur %1", "Player %1", "اللاعب %1");
+    add("mono_token_0", "Voiture", "Racecar", "سيارة سباق");
+    add("mono_token_1", "Cuirassé", "Battleship", "بارجة");
+    add("mono_token_2", "Haut-de-forme", "Top Hat", "قبعة عالية");
+    add("mono_token_3", "Chien", "Scottie Dog", "كلب");
+    add("mono_token_4", "Chaussure", "Boot", "حذاء");
+    add("mono_token_5", "Chat", "Cat", "قط");
+    add("mono_token_6", "Dé à coudre", "Thimble", "كشتبان");
+    add("mono_token_7", "Brouette", "Wheelbarrow", "عربة يدوية");
+
+    // Monopoly - In-game HUD & Bottom Bar
+    add("mono_bank", "BANQUE", "BANK", "البنك");
+    add("mono_history", "HISTORIQUE", "HISTORY", "السجل");
+    add("mono_menu_btn", "MENU", "MENU", "القائمة");
+    add("mono_build_btn", "CONSTRUIRE", "BUILD", "بناء");
+    add("mono_sell_btn", "VENDRE", "SELL", "بيع");
+    add("mono_mortgage_btn", "HYPOTHÉQUER", "MORTGAGE", "رهن");
+    add("mono_unmortgage_btn", "LEVER L'HYPOTHÈQUE", "UNMORTGAGE", "فك الرهن");
+    add("mono_trade_btn", "ÉCHANGE", "TRADE", "مقايضة");
+    add("mono_starts_first", "%1 commence en premier.", "%1 goes first.", "%1 يبدأ أولاً.");
+    add("mono_roll_dice", "JETER LES DÉS", "ROLL DICE", "رمي النرد");
+    add("mono_end_turn", "FINIR TOUR", "END TURN", "إنهاء الدور");
+    add("mono_pay_jail_50", "PAYER 50 ₩", "PAY 50 ₩", "دفع 50 ₩");
+    add("mono_use_jail_card", "CARTE LIBÉRÉ", "USE JAIL CARD", "بطاقة الخروج");
+    add("mono_for_sale", "À VENDRE", "FOR SALE", "للبيع");
+    add("mono_buy_btn", "ACHETER", "BUY", "شراء");
+    add("mono_auction_btn", "ENCHÈRE", "AUCTION", "مزاد");
+    add("mono_bid_turn", "Tour de mise :", "Bidding turn:", "دور المزايدة:");
+    add("mono_bid_btn", "MISER", "BID", "مزايدة");
+    add("mono_fold_btn", "SE COUCHER", "FOLD", "انسحاب");
+    add("mono_highest_bid", "Mise max : %1 ₩ (%2)", "High bid: %1 ₩ (%2)", "أعلى مزايدة: %1 ₩ (%2)");
+    add("mono_pay_rent_title", "PAYEZ LOYER", "PAY RENT", "دفع الإيجار");
+    add("mono_rent_label", "LOYER", "RENT", "الإيجار");
+    add("mono_propose_btn", "PROPOSITION", "PROPOSE", "اقتراح");
+    add("mono_cancel_btn", "ANNULER", "CANCEL", "إلغاء");
+    add("mono_transfer_cash", "Transférer argent", "Transfer money", "تحويل الأموال");
+    add("mono_trade_hint", "Cliquez sur les propriétés et définissez l'argent pour composer votre échange.",
+        "Click properties and set money amounts to compose your trade.",
+        "انقر على العقارات وحدد المبلغ المالي لتكوين عرض المقايضة.");
+    add("mono_trade_accepted", "Échange accepté !", "Trade accepted!", "تم قبول المقايضة!");
+    add("mono_trade_rejected", "L'adversaire a refusé votre proposition d'échange.", "Opponent declined your trade offer.", "رفض الخصم عرض المقايضة.");
+    add("mono_bankrupt_btn", "FAILLITE", "BANKRUPT", "إفلاس");
+    add("mono_debt_title", "DETTE À PAYER : %1 ₩", "DEBT TO PAY: %1 ₩", "دين مستحق الدفع: %1 ₩");
+    add("mono_debt_hint", "Vendez des maisons, hypothéquez des terrains ou faites un échange pour réunir la somme.",
+        "Sell houses, mortgage properties, or trade to raise the required funds.",
+        "بِع المنازل أو ارهن العقارات أو قايض لجمع المبلغ المطلوب.");
+    add("mono_winner_title", "VICTOIRE DE %1 !", "%1 WINS!", "فوز %1!");
+    add("mono_winner_sub", "Fortune totale : %1 ₩", "Total Net Worth: %1 ₩", "إجمالي الثروة: %1 ₩");
+    add("mono_setup_lobby_btn", "CONFIGURER JOUEURS", "PLAYER SETUP", "إعداد اللاعبين");
+    add("mono_resume_btn", "REPRENDRE", "RESUME", "استئناف");
+
+    // Monopoly - Title Deed Cards
+    add("mono_deed_title", "TITRE DE PROPRIÉTÉ", "TITLE DEED", "سند ملكية");
+    add("mono_deed_rent_base", "LOYER Terrain nu", "RENT Site only", "إيجار الأرض الفارغة");
+    add("mono_deed_house_1", "Avec 1 Maison", "With 1 House", "مع منزل واحد");
+    add("mono_deed_house_2", "Avec 2 Maisons", "With 2 Houses", "مع منزلين");
+    add("mono_deed_house_3", "Avec 3 Maisons", "With 3 Houses", "مع 3 منازل");
+    add("mono_deed_house_4", "Avec 4 Maisons", "With 4 Houses", "مع 4 منازل");
+    add("mono_deed_hotel", "Avec HÔTEL", "With HOTEL", "مع فندق");
+    add("mono_deed_mortgage_val", "Valeur Hypothécaire %1 ₩", "Mortgage Value %1 ₩", "قيمة الرهن العقاري %1 ₩");
+    add("mono_deed_house_cost", "Prix des Maisons %1 ₩ chacune", "Houses cost %1 ₩ each", "تكلفة المنزل %1 ₩ لكل واحد");
+    add("mono_deed_hotel_cost", "Prix d'un Hôtel %1 ₩ plus 4 maisons", "Hotels, %1 ₩ plus 4 houses", "تكلفة الفندق %1 ₩ + 4 منازل");
+    add("mono_deed_group_rule", "Si un joueur possède TOUS les terrains d'un groupe de couleur quelconque, le loyer des terrains nus de ce groupe est doublé.",
+        "If a player owns ALL the Lots of any Color-Group, the rent is Doubled on Unimproved Lots in that group.",
+        "إذا امتلك اللاعب جميع أراضي مجموعة لونية كاملة، يتضاعف إيجار الأراضي غير المبنية فيها.");
+    add("mono_deed_rr_1", "Loyer (1 gare)", "Rent (1 station)", "الإيجار (محطة واحدة)");
+    add("mono_deed_rr_2", "Si vous avez 2 gares", "If 2 stations are owned", "إذا امتلكت محطتين");
+    add("mono_deed_rr_3", "Si vous avez 3 gares", "If 3 stations are owned", "إذا امتلكت 3 محطات");
+    add("mono_deed_rr_4", "Si vous avez 4 gares", "If 4 stations are owned", "إذا امتلكت 4 محطات");
+    add("mono_deed_util_1", "Si l'on possède UNE compagnie de service public, le loyer est 4 fois le montant indiqué par les dés.",
+        "If ONE Utility is owned, rent is 4 times amount shown on dice.",
+        "إذا امتلكت شركة خدمات واحدة، يكون الإيجار 4 أضعاف مجموع النرد.");
+    add("mono_deed_util_2", "Si l'on possède les DEUX compagnies de service public, le loyer est 10 fois le montant indiqué par les dés.",
+        "If BOTH Utilities are owned, rent is 10 times amount shown on dice.",
+        "إذا امتلكت كلتا شركتي الخدمات، يكون الإيجار 10 أضعاف مجموع النرد.");
+    add("mono_mortgaged_for", "HYPOTHÉQUÉE POUR %1 ₩", "MORTGAGED FOR %1 ₩", "مرهونة مقابل %1 ₩");
+    add("mono_mortgaged_note", "Si cette propriété est hypothéquée, ce côté de la carte doit être mis en évidence.",
+        "Card must be turned this side up if property is mortgaged.",
+        "إذا كان هذا العقار مرهوناً، يظهر هذا الوجه من البطاقة.");
+
+    // Monopoly - Board corner & tile labels
+    add("mono_go_title", "DÉPART", "GO", "الانطلاق");
+    add("mono_go_sub", "RECEVEZ 200 ₩ CHAQUE FOIS QUE VOUS PASSEZ ICI", "COLLECT 200 ₩ SALARY AS YOU PASS", "احصل على 200 ₩ عند المرور");
+    add("mono_jail_just", "SIMPLE", "JUST", "مجرد");
+    add("mono_jail_visiting", "VISITE", "VISITING", "زيارة");
+    add("mono_in_jail", "EN PRISON", "IN JAIL", "في السجن");
+    add("mono_free_parking", "PARC", "FREE", "موقف");
+    add("mono_free_parking_2", "GRATUIT", "PARKING", "مجاني");
+    add("mono_go_to_jail_1", "ALLEZ EN", "GO TO", "اذهب إلى");
+    add("mono_go_to_jail_2", "PRISON", "JAIL", "السجن");
+    add("mono_pay_amount", "PAYEZ %1 ₩", "PAY %1 ₩", "ادفع %1 ₩");
+
+    // Monopoly - 40 Board Spaces
+    add("mono_space_0",  "DÉPART", "GO", "الانطلاق");
+    add("mono_space_1",  "BOULEVARD DE BELLEVILLE", "BELLEVILLE BOULEVARD", "بوليفارد بيلفيل");
+    add("mono_space_2",  "CAISSE DE COMMUNAUTÉ", "COMMUNITY CHEST", "صندوق الجماعة");
+    add("mono_space_3",  "RUE LECOURBE", "LECOURBE STREET", "شارع لوكورب");
+    add("mono_space_4",  "IMPÔTS SUR LE REVENU", "INCOME TAX", "ضريبة الدخل");
+    add("mono_space_5",  "GARE MONTPARNASSE", "MONTPARNASSE STATION", "محطة مونبارناس");
+    add("mono_space_6",  "RUE DE VAUGIRARD", "VAUGIRARD STREET", "شارع فوجيرار");
+    add("mono_space_7",  "CHANCE", "CHANCE", "فرصة");
+    add("mono_space_8",  "RUE DE COURCELLES", "COURCELLES STREET", "شارع كورسيل");
+    add("mono_space_9",  "AVENUE DE LA RÉPUBLIQUE", "REPUBLIC AVENUE", "شارع الجمهورية");
+    add("mono_space_10", "PRISON", "JAIL", "السجن");
+    add("mono_space_11", "BOULEVARD DE LA VILLETTE", "LA VILLETTE BOULEVARD", "بوليفارد لافيليت");
+    add("mono_space_12", "COMPAGNIE D'ÉLECTRICITÉ", "ELECTRIC COMPANY", "شركة الكهرباء");
+    add("mono_space_13", "AVENUE DE NEUILLY", "NEUILLY AVENUE", "شارع نويي");
+    add("mono_space_14", "RUE DE PARADIS", "PARADIS STREET", "شارع بارادي");
+    add("mono_space_15", "GARE DE LYON", "LYON STATION", "محطة ليون");
+    add("mono_space_16", "AVENUE MOZART", "MOZART AVENUE", "شارع موزارت");
+    add("mono_space_17", "CAISSE DE COMMUNAUTÉ", "COMMUNITY CHEST", "صندوق الجماعة");
+    add("mono_space_18", "BOULEVARD SAINT-MICHEL", "SAINT-MICHEL BOULEVARD", "بوليفارد سان ميشيل");
+    add("mono_space_19", "PLACE PIGALLE", "PIGALLE SQUARE", "ساحة بيغال");
+    add("mono_space_20", "PARC GRATUIT", "FREE PARKING", "موقف مجاني");
+    add("mono_space_21", "AVENUE MATIGNON", "MATIGNON AVENUE", "شارع ماتينيون");
+    add("mono_space_22", "CHANCE", "CHANCE", "فرصة");
+    add("mono_space_23", "BOULEVARD MALESHERBES", "MALESHERBES BOULEVARD", "بوليفارد مالزيرب");
+    add("mono_space_24", "AVENUE HENRI-MARTIN", "HENRI-MARTIN AVENUE", "شارع هنري مارتن");
+    add("mono_space_25", "GARE DU NORD", "NORTH STATION", "محطة الشمال");
+    add("mono_space_26", "FAUBOURG SAINT-HONORÉ", "FAUBOURG SAINT-HONORÉ", "فوبور سان أونوريه");
+    add("mono_space_27", "PLACE DE LA BOURSE", "LA BOURSE SQUARE", "ساحة البورصة");
+    add("mono_space_28", "COMPAGNIE DES EAUX", "WATER WORKS", "شركة المياه");
+    add("mono_space_29", "RUE LA FAYETTE", "LA FAYETTE STREET", "شارع لافاييت");
+    add("mono_space_30", "ALLEZ EN PRISON", "GO TO JAIL", "اذهب إلى السجن");
+    add("mono_space_31", "AVENUE DE BRETEUIL", "BRETEUIL AVENUE", "شارع بروتوي");
+    add("mono_space_32", "AVENUE FOCH", "FOCH AVENUE", "شارع فوش");
+    add("mono_space_33", "CAISSE DE COMMUNAUTÉ", "COMMUNITY CHEST", "صندوق الجماعة");
+    add("mono_space_34", "BOULEVARD DES CAPUCINES", "CAPUCINES BOULEVARD", "بوليفارد كابوسين");
+    add("mono_space_35", "GARE SAINT-LAZARE", "SAINT-LAZARE STATION", "محطة سان لازار");
+    add("mono_space_36", "CHANCE", "CHANCE", "فرصة");
+    add("mono_space_37", "AVENUE DES CHAMPS-ÉLYSÉES", "CHAMPS-ÉLYSÉES AVENUE", "شارع الشانزليزيه");
+    add("mono_space_38", "TAXE DE LUXE", "LUXURY TAX", "ضريبة الرفاهية");
+    add("mono_space_39", "RUE DE LA PAIX", "RUE DE LA PAIX", "شارع السلام (لا بيه)");
+
+    // Monopoly - 16 Chance Cards
+    add("mono_chance_0",  "AVANCEZ JUSQU'À LA CASE DÉPART. (RECEVEZ 200 ₩).",
+        "ADVANCE TO GO. (COLLECT 200 ₩).",
+        "تقدم إلى خانة الانطلاق. (احصل على 200 ₩).");
+    add("mono_chance_1",  "RENDEZ-VOUS RUE DE LA PAIX.",
+        "ADVANCE TO RUE DE LA PAIX.",
+        "توجه إلى شارع السلام (لا بيه).");
+    add("mono_chance_2",  "RENDEZ-VOUS À L'AVENUE HENRI-MARTIN. SI VOUS PASSEZ PAR LA CASE DÉPART, RECEVEZ 200 ₩.",
+        "ADVANCE TO HENRI-MARTIN AVENUE. IF YOU PASS GO, COLLECT 200 ₩.",
+        "توجه إلى شارع هنري مارتن. إذا مررت بالانطلاق احصل على 200 ₩.");
+    add("mono_chance_3",  "AVANCEZ AU BOULEVARD DE LA VILLETTE. SI VOUS PASSEZ PAR LA CASE DÉPART, RECEVEZ 200 ₩.",
+        "ADVANCE TO LA VILLETTE BOULEVARD. IF YOU PASS GO, COLLECT 200 ₩.",
+        "تقدم إلى بوليفارد لافيليت. إذا مررت بالانطلاق احصل على 200 ₩.");
+    add("mono_chance_4",  "RENDEZ-VOUS À LA GARE DE LYON. SI VOUS PASSEZ PAR LA CASE DÉPART, RECEVEZ 200 ₩.",
+        "TAKE A TRIP TO LYON STATION. IF YOU PASS GO, COLLECT 200 ₩.",
+        "توجه إلى محطة ليون. إذا مررت بالانطلاق احصل على 200 ₩.");
+    add("mono_chance_5",  "AVANCEZ JUSQU'À LA GARE LA PLUS PROCHE. SI ELLE APPARTIENT À UN JOUEUR, PAYEZ-LUI LE DOUBLE DU LOYER.",
+        "ADVANCE TO THE NEAREST STATION. IF OWNED, PAY OWNER TWICE THE RENTAL.",
+        "تقدم إلى أقرب محطة قطار. إذا كانت مملوكة، ادفع ضعف الإيجار.");
+    add("mono_chance_6",  "AVANCEZ JUSQU'À LA COMPAGNIE DE SERVICE PUBLIC LA PLUS PROCHE.",
+        "ADVANCE TOKEN TO NEAREST UTILITY.",
+        "تقدم إلى أقرب شركة خدمات عامة.");
+    add("mono_chance_7",  "RECULEZ DE TROIS CASES.",
+        "GO BACK THREE SPACES.",
+        "تراجع ثلاث خانات للخلف.");
+    add("mono_chance_8",  "ALLEZ EN PRISON. NE FRANCHISSEZ PAS LA CASE DÉPART, NE TOUCHEZ PAS 200 ₩.",
+        "GO DIRECTLY TO JAIL. DO NOT PASS GO, DO NOT COLLECT 200 ₩.",
+        "اذهب مباشرة إلى السجن. لا تمر بالانطلاق ولا تحصل على 200 ₩.");
+    add("mono_chance_9",  "VOUS ÊTES LIBÉRÉ DE PRISON. CETTE CARTE PEUT ÊTRE CONSERVÉE JUSQU'À CE QU'ELLE SOIT UTILISÉE OU VENDUE.",
+        "GET OUT OF JAIL FREE. THIS CARD MAY BE KEPT UNTIL NEEDED OR TRADED.",
+        "أنت حر من السجن. يمكنك الاحتفاظ بهذه البطاقة لاستخدامها أو مقايضتها.");
+    add("mono_chance_10", "VOUS DEVEZ FAIRE DES TRAVAUX SUR VOS PROPRIÉTÉS : VERSEZ 25 ₩ POUR CHAQUE MAISON ET 100 ₩ POUR CHAQUE HÔTEL.",
+        "MAKE GENERAL REPAIRS ON ALL YOUR PROPERTY: FOR EACH HOUSE PAY 25 ₩, FOR EACH HOTEL PAY 100 ₩.",
+        "يجب إجراء صيانة لعقاراتك: ادفع 25 ₩ عن كل منزل و100 ₩ عن كل فندق.");
+    add("mono_chance_11", "AMENDE POUR EXCÈS DE VITESSE SUR LE PÉRIPHÉRIQUE : PAYEZ 15 ₩.",
+        "SPEEDING FINE ON THE RING ROAD: PAY 15 ₩.",
+        "غرامة تجاوز السرعة على الطريق الدائري: ادفع 15 ₩.");
+    add("mono_chance_12", "VOUS AIDEZ À RAMASSER LES DÉCHETS DANS PARIS. RECEVEZ 100 ₩.",
+        "YOU HELP CLEAN UP PARIS STREETS. COLLECT 100 ₩.",
+        "لقد ساعدت في تنظيف شوارع باريس. احصل على 100 ₩.");
+    add("mono_chance_13", "LA BANQUE VOUS VERSE UN DIVIDENDE DE 50 ₩.",
+        "BANK PAYS YOU DIVIDEND OF 50 ₩.",
+        "يدفع لك البنك أرباح أسهم بقيمة 50 ₩.");
+    add("mono_chance_14", "VOTRE IMMEUBLE ET VOTRE PRÊT RAPPORTENT. VOUS DEVEZ TOUCHER 150 ₩.",
+        "YOUR BUILDING AND LOAN MATURES. COLLECT 150 ₩.",
+        "استحقاق عوائد المباني والقروض الخاصة بك. احصل على 150 ₩.");
+    add("mono_chance_15", "VOUS AVEZ ÉTÉ ÉLU PRÉSIDENT DU CONSEIL D'ADMINISTRATION. VERSEZ 50 ₩ À CHAQUE JOUEUR.",
+        "YOU HAVE BEEN ELECTED CHAIRMAN OF THE BOARD. PAY EACH PLAYER 50 ₩.",
+        "تم انتخابك رئيساً لمجلس الإدارة. ادفع 50 ₩ لكل لاعب.");
+
+    // Monopoly - 16 Community Chest Cards
+    add("mono_chest_0",  "AVANCEZ JUSQU'À LA CASE DÉPART. (RECEVEZ 200 ₩).",
+        "ADVANCE TO GO. (COLLECT 200 ₩).",
+        "تقدم إلى خانة الانطلاق. (احصل على 200 ₩).");
+    add("mono_chest_1",  "ERREUR DE LA BANQUE EN VOTRE FAVEUR. RECEVEZ 200 ₩.",
+        "BANK ERROR IN YOUR FAVOR. COLLECT 200 ₩.",
+        "خطأ بنكي لصالحك. احصل على 200 ₩.");
+    add("mono_chest_2",  "VISITEZ LE MÉDECIN : PAYEZ 50 ₩.",
+        "DOCTOR'S FEES: PAY 50 ₩.",
+        "رسوم زيارة الطبيب: ادفع 50 ₩.");
+    add("mono_chest_3",  "LA VENTE DE VOTRE STOCK VOUS RAPPORTE 50 ₩.",
+        "FROM SALE OF STOCK YOU GET 50 ₩.",
+        "من بيع الأسهم الخاصة بك تحصل على 50 ₩.");
+    add("mono_chest_4",  "VOUS ÊTES LIBÉRÉ DE PRISON. CETTE CARTE PEUT ÊTRE CONSERVÉE JUSQU'À CE QU'ELLE SOIT UTILISÉE OU VENDUE.",
+        "GET OUT OF JAIL FREE. THIS CARD MAY BE KEPT UNTIL NEEDED OR TRADED.",
+        "أنت حر من السجن. يمكنك الاحتفاظ بهذه البطاقة لاستخدامها أو مقايضتها.");
+    add("mono_chest_5",  "ALLEZ EN PRISON. NE FRANCHISSEZ PAS LA CASE DÉPART, NE TOUCHEZ PAS 200 ₩.",
+        "GO DIRECTLY TO JAIL. DO NOT PASS GO, DO NOT COLLECT 200 ₩.",
+        "اذهب مباشرة إلى السجن. لا تمر بالانطلاق ولا تحصل على 200 ₩.");
+    add("mono_chest_6",  "C'EST VOTRE ANNIVERSAIRE : CHAQUE JOUEUR DOIT VOUS DONNER 10 ₩.",
+        "IT IS YOUR BIRTHDAY: COLLECT 10 ₩ FROM EVERY PLAYER.",
+        "إنه عيد ميلادك: يعطيك كل لاعب 10 ₩.");
+    add("mono_chest_7",  "VOTRE ASSURANCE VIE VOUS RAPPORTE 100 ₩.",
+        "LIFE INSURANCE MATURES. COLLECT 100 ₩.",
+        "استحقاق التأمين على الحياة. احصل على 100 ₩.");
+    add("mono_chest_8",  "FRAIS D'HOSPITALISATION : PAYEZ 100 ₩.",
+        "HOSPITAL FEES: PAY 100 ₩.",
+        "رسوم المستشفى: ادفع 100 ₩.");
+    add("mono_chest_9",  "FRAIS DE SCOLARITÉ : PAYEZ 50 ₩.",
+        "SCHOOL FEES: PAY 50 ₩.",
+        "الرسوم الدراسية: ادفع 50 ₩.");
+    add("mono_chest_10", "RECEVEZ 25 ₩ D'HONORAIRES DE CONSEIL.",
+        "RECEIVE 25 ₩ CONSULTANCY FEE.",
+        "احصل على 25 ₩ أتعاب استشارات.");
+    add("mono_chest_11", "VOUS ÊTES IMPOSÉ POUR LES RÉPARATIONS DE VOIRIE : 40 ₩ PAR MAISON ET 115 ₩ PAR HÔTEL.",
+        "YOU ARE ASSESSED FOR STREET REPAIRS: 40 ₩ PER HOUSE AND 115 ₩ PER HOTEL.",
+        "ضريبة إصلاح الطرقات: ادفع 40 ₩ عن كل منزل و115 ₩ عن كل فندق.");
+    add("mono_chest_12", "VOUS AVEZ GAGNÉ LE DEUXIÈME PRIX DE BEAUTÉ. RECEVEZ 10 ₩.",
+        "YOU HAVE WON SECOND PRIZE IN A BEAUTY CONTEST. COLLECT 10 ₩.",
+        "فزت بالجائزة الثانية في مسابقة الجمال. احصل على 10 ₩.");
+    add("mono_chest_13", "VOUS HÉRITEZ DE 100 ₩.",
+        "YOU INHERIT 100 ₩.",
+        "لقد ورثت 100 ₩.");
+    add("mono_chest_14", "LES IMPÔTS VOUS REMBOURSENT. RECEVEZ 150 ₩.",
+        "INCOME TAX REFUND. COLLECT 150 ₩.",
+        "استرداد ضريبي. احصل على 150 ₩.");
+    add("mono_chest_15", "RETOURNEZ À BELLEVILLE.",
+        "GO BACK TO BELLEVILLE BOULEVARD.",
+        "عد إلى بوليفارد بيلفيل.");
+
+    // Monopoly - History Log Messages
+    add("mono_log_welcome", "Bienvenue dans Monopoly", "Welcome to Monopoly", "مرحباً بكم في مونوبولي");
+    add("mono_log_moved", "%1 s'est déplacé sur %2.", "%1 moved to %2.", "انتقل %1 إلى %2.");
+    add("mono_log_moved_double", "%1 a fait un double et s'est déplacé sur %2.", "%1 rolled a double and moved to %2.", "حصل %1 على نرد مزدوج وانتقل إلى %2.");
+    add("mono_log_passed_go", "%1 passe par la case Départ et reçoit 200 ₩.", "%1 passed GO and collected 200 ₩.", "مر %1 بخانة الانطلاق وحصل على 200 ₩.");
+    add("mono_log_bought_property", "%1 a acheté %2 pour %3 ₩.", "%1 bought %2 for %3 ₩.", "اشترى %1 عقار %2 مقابل %3 ₩.");
+    add("mono_log_paid_rent", "%1 a payé %3 ₩ de loyer à %2.", "%1 paid %3 ₩ rent to %2.", "دفع %1 إيجاراً بقيمة %3 ₩ إلى %2.");
+    add("mono_log_paid_tax", "%1 a payé %3 ₩ en %2.", "%1 paid %3 ₩ in %2.", "دفع %1 مبلغ %3 ₩ في %2.");
+    add("mono_log_sent_to_jail", "%1 est envoyé en prison !", "%1 was sent to Jail!", "تم إرسال %1 إلى السجن!");
+    add("mono_log_three_doubles_jail", "%1 a fait 3 doubles d'affilée : direction la prison !", "%1 rolled 3 doubles in a row: go to Jail!", "حصل %1 على 3 أزواج متتالية: إلى السجن!");
+    add("mono_log_paid_jail", "%1 a payé 50 ₩ de caution pour sortir de prison.", "%1 paid 50 ₩ fine to leave Jail.", "دفع %1 كفالة 50 ₩ للخروج من السجن.");
+    add("mono_log_used_jail_card", "%1 a utilisé une carte Libéré de prison.", "%1 used a Get Out of Jail Free card.", "استخدم %1 بطاقة الخروج من السجن.");
+    add("mono_log_jail_double_escape", "%1 a fait un double et sort de prison !", "%1 rolled a double and escaped Jail!", "حصل %1 على نرد مزدوج وخرج من السجن!");
+    add("mono_log_stay_in_jail", "%1 reste en prison.", "%1 stays in Jail.", "يبقى %1 في السجن.");
+    add("mono_log_auction_started", "Mise aux enchères de %1 !", "Auction started for %1!", "بدأ المزاد العلني على %1!");
+    add("mono_log_auction_won", "%1 remporte l'enchère pour %2 à %3 ₩.", "%1 won the auction for %2 at %3 ₩.", "فاز %1 بالمزاد على %2 مقابل %3 ₩.");
+    add("mono_log_card_collect", "%1 reçoit %2 ₩ grâce à une carte.", "%1 collected %2 ₩ from a card.", "حصل %1 على %2 ₩ من بطاقة.");
+    add("mono_log_card_pay", "%1 paye %2 ₩ suite à une carte.", "%1 paid %2 ₩ from a card.", "دفع %1 مبلغ %2 ₩ بسبب بطاقة.");
+    add("mono_log_got_jail_card", "%1 obtient une carte Vous êtes libéré de prison.", "%1 received a Get Out of Jail Free card.", "حصل %1 على بطاقة الخروج من السجن.");
+    add("mono_log_built_house", "%1 a construit une maison sur %2 (%3 ₩).", "%1 built a house on %2 (%3 ₩).", "بنى %1 منزلاً على %2 (%3 ₩).");
+    add("mono_log_built_hotel", "%1 a construit un hôtel sur %2 (%3 ₩).", "%1 built a hotel on %2 (%3 ₩).", "بنى %1 فندقاً على %2 (%3 ₩).");
+    add("mono_log_sold_building", "%1 a vendu un bâtiment sur %2 (+%3 ₩).", "%1 sold a building on %2 (+%3 ₩).", "باع %1 مبنى على %2 (+%3 ₩).");
+    add("mono_log_mortgaged", "%1 a hypothéqué %2 (+%3 ₩).", "%1 mortgaged %2 (+%3 ₩).", "رهن %1 عقار %2 (+%3 ₩).");
+    add("mono_log_unmortgaged", "%1 a levé l'hypothèque de %2 (-%3 ₩).", "%1 unmortgaged %2 (-%3 ₩).", "فك %1 رهن عقار %2 (-%3 ₩).");
+    add("mono_log_trade_completed", "Échange conclu entre %1 et %2.", "Trade completed between %1 and %2.", "تمت مقايضة ناجحة بين %1 و %2.");
+    add("mono_log_bankrupt", "%1 est déclaré en faillite !", "%1 has declared bankruptcy!", "أعلن %1 إفلاسه!");
+
+    // Monopoly - 11 Interactive Visual Rules Pages (matching the screenshots)
+    add("mono_rule_title_0", "LE BUT & POUR COMMENCER", "THE GOAL & GETTING STARTED", "الهدف والبداية");
+    add("mono_rule_body_0",
+        "LE BUT : Remportez le plus d'argent possible et ruinez vos adversaires !\n\n"
+        "POUR COMMENCER :\n"
+        "Jouez contre un, deux ou trois joueurs en cliquant sur AJOUTER JOUEUR.\n"
+        "Choisissez la difficulté de vos adversaires :\n"
+        " - Agent immobilier = adversaire facile\n"
+        " - Entrepreneur = adversaire intermédiaire\n"
+        " - Magnat de l'immobilier = adversaire difficile\n\n"
+        "Cliquez sur l'icône d'un pion pour choisir votre propre pion.\n"
+        "Cliquez sur JOUER pour commencer à faire fortune !",
+        "THE GOAL: Earn the most money possible and bankrupt your opponents!\n\n"
+        "GETTING STARTED:\n"
+        "Play against one, two, or three players by clicking ADD PLAYER.\n"
+        "Choose your opponents' difficulty:\n"
+        " - Real Estate Agent = easy opponent\n"
+        " - Entrepreneur = medium opponent\n"
+        " - Real Estate Tycoon = hard opponent\n\n"
+        "Click on a token icon to choose your own token.\n"
+        "Click PLAY to start building your fortune!",
+        "الهدف: اجمع أكبر ثروة ممكنة وأفلس منافسيك!\n\n"
+        "للبدء:\n"
+        "العب ضد لاعب أو اثنين أو ثلاثة بالنقر على إضافة لاعب.\n"
+        "اختر مستوى صعوبة منافسيك:\n"
+        " - وكيل عقاري = منافس سهل\n"
+        " - مقاول = منافس متوسط\n"
+        " - قطب العقارات = منافس صعب\n\n"
+        "انقر على أيقونة البيدق لاختيار قطعتك المفضلة، ثم انقر على العب للبدء!");
+
+    add("mono_rule_title_1", "L'ÉCRAN DE JEU", "THE GAME SCREEN", "شاشة اللعب");
+    add("mono_rule_body_1",
+        "Plateau : c'est ici que se déroule l'action de la partie.\n\n"
+        "Informations joueur : ici, vous pouvez consulter l'argent possédé par chaque joueur sur leurs comptes, les propriétés qu'ils possèdent, leurs maisons et hôtels, et les cartes Vous êtes libéré de prison possédées.\n\n"
+        "Banque : consultez les réserves de maisons et d'hôtels.\n\n"
+        "Historique : rendez-vous ici pour consulter tous les événements relatifs à la partie en temps réel.",
+        "Board: This is where all the game action takes place.\n\n"
+        "Player Info: Check each player's cash balance, the properties they own by color group, their houses and hotels, and any Get Out of Jail Free cards held.\n\n"
+        "Bank: Check available houses and hotels.\n\n"
+        "History: View all timestamped game events in real time.",
+        "اللوحة: هنا تدور كافة أحداث المباراة.\n\n"
+        "معلومات اللاعب: يمكنك متابعة الرصيد المالي لكل لاعب، والعقارات التي يمتلكها حسب المجموعات اللونية، والمنازل والفنادق، وبطاقات الخروج من السجن.\n\n"
+        "السجل: تابع كافة أحداث اللعبة لحظة بلحظة.");
+
+    add("mono_rule_title_2", "LANCER LES DÉS", "ROLLING THE DICE", "رمي النرد");
+    add("mono_rule_body_2",
+        "Chaque tour débute par un lancer de dés. À votre tour, cliquez sur JETER LES DÉS.\n\n"
+        "Votre pion se déplacera automatiquement sur le plateau du nombre de cases correspondant au résultat de vos dés. Les cases du plateau peuvent être occupées par plusieurs pions en même temps.\n\n"
+        "DOUBLE : si les deux dés indiquent le même chiffre, vous avez fait un double ! Vous relancez les dés. Cependant, au TROISIÈME double consécutif, vous allez directement en prison.",
+        "Each turn begins with a dice roll. On your turn, click ROLL DICE.\n\n"
+        "Your token automatically moves around the board by the number of spaces rolled. Multiple tokens can occupy the same space simultaneously.\n\n"
+        "DOUBLES: If both dice show the same number, you rolled a double and get another roll! However, on your THIRD consecutive double, you go directly to Jail.",
+        "يبدأ كل دور برمي النرد. في دورك، انقر على رمي النرد.\n\n"
+        "سيتحرك بيدقك تلقائياً على اللوحة بعدد الخانات الموافق لمجموع النرد.\n\n"
+        "النرد المزدوج (الدوبل): إذا أظهر النردان نفس الرقم، تحصل على رمية إضافية! لكن عند الحصول على المزدوج الثالث على التوالي، تذهب مباشرة إلى السجن.");
+
+    add("mono_rule_title_3", "ACHETER UNE PROPRIÉTÉ", "BUYING A PROPERTY", "شراء عقار والمزاد");
+    add("mono_rule_body_3",
+        "Quand vous vous arrêtez sur une propriété qui n'appartient à personne, la Banque vous propose de l'acheter. Cliquez sur ACHETER pour l'acquérir au prix indiqué.\n\n"
+        "Ou cliquez sur ENCHÈRE pour l'acquérir peut-être à un prix moindre ! Tous les joueurs peuvent miser dans une enchère. Le joueur qui remporte l'enchère paye le montant de la mise gagnante à la Banque et reçoit le Titre de propriété. Si une propriété n'est pas achetée, elle est obligatoirement mise aux enchères.",
+        "When you land on an unowned property, the Bank offers it for sale. Click BUY to purchase it at the listed price.\n\n"
+        "Or click AUCTION to start a bidding war! All players can bid in an auction. The highest bidder pays their winning bid to the Bank and receives the Title Deed. If a property is not bought directly, it must be auctioned.",
+        "عندما تتوقف على عقار غير مملوك لأحد، يعرض عليك البنك شراءه. انقر على شراء للحصول عليه بالسعر المعلن.\n\n"
+        "أو انقر على مزاد لطرحه في مزاد علني بين جميع اللاعبين! الفائز بأعلى مزايدة يدفع المبلغ للبنك ويستلم سند الملكية.");
+
+    add("mono_rule_title_4", "PAYER LE LOYER", "PAYING RENT", "دفع الإيجار");
+    add("mono_rule_body_4",
+        "Quand vous vous arrêtez sur une propriété qui appartient à un autre joueur, son propriétaire vous demande de payer un loyer selon le Titre de propriété. Si la propriété est hypothéquée, aucun loyer n'est perçu.\n\n"
+        "ASTUCE POUR DEVENIR RICHE !\n"
+        "Essayez de posséder tous les Titres de propriété d'un même groupe de couleur. Quand vous possédez toutes les propriétés d'un groupe de couleur, les loyers perçus sur les terrains nus sont doublés !",
+        "When you land on a property owned by another player, you must pay rent according to its Title Deed card. If the property is mortgaged, no rent is collected.\n\n"
+        "TIP TO GET RICH!\n"
+        "Try to collect all Title Deeds of the same color group. When you own a complete color group, rent on unimproved properties in that group is doubled!",
+        "عندما تتوقف على عقار يملكه لاعب آخر، يتوجب عليك دفع الإيجار المحدد في سند الملكية. إذا كان العقار مرهوناً فلا يُدفع أي إيجار.\n\n"
+        "نصيحة للثراء!\n"
+        "احرص على امتلاك كافة عقارات المجموعة اللونية الواحدة، فعندها يتضاعف إيجار الأراضي غير المبنية في تلك المجموعة!");
+
+    add("mono_rule_title_5", "CARTES CHANCE & COMMUNAUTÉ", "CHANCE & COMMUNITY CHEST", "بطاقات الفرصة وصندوق الجماعة");
+    add("mono_rule_body_5",
+        "Quand vous vous arrêtez sur l'une de ces cases, vous tirez la carte du dessus de la pile. La Banque se charge automatiquement de prendre ou donner l'argent ou de déplacer votre pion selon la carte.\n\n"
+        "CARTES VOUS ÊTES LIBÉRÉ DE PRISON :\n"
+        "Vous pouvez conserver cette carte jusqu'à ce qu'elle vous soit utile pour sortir gratuitement de prison, ou la vendre à un autre joueur lors d'un échange.",
+        "When you land on one of these spaces, you draw the top card from the deck. The Bank automatically collects or pays money or moves your token as instructed.\n\n"
+        "GET OUT OF JAIL FREE CARDS:\n"
+        "Keep this card until you need it to escape Jail for free, or trade it to another player at an agreed price.",
+        "عند التوقف على إحدى هذه الخانات، تسحب البطاقة العلوية وتُنفذ تعليماتها تلقائياً.\n\n"
+        "بطاقات الخروج من السجن:\n"
+        "يمكنك الاحتفاظ بهذه البطاقة لاستخدامها عند الحاجة للخروج مجاناً من السجن، أو مقايضتها مع لاعب آخر.");
+
+    add("mono_rule_title_6", "CASE DÉPART & PRISON", "GO & JAIL", "خانة الانطلاق والسجن");
+    add("mono_rule_body_6",
+        "CASE DÉPART : À chaque fois que votre pion s'arrête ou passe par la case Départ, la Banque vous paye 200 ₩ !\n\n"
+        "PRISON : Vous allez en prison si vous tombez sur Allez en prison, tirez une carte Allez en prison, ou faites 3 doubles de suite.\n"
+        "En prison, vous percevez toujours vos loyers et pouvez construire ou échanger. Pour sortir : faites un double (3 essais max), utilisez une carte Libéré de prison, ou payez une caution de 50 ₩ avant de lancer les dés.",
+        "GO SPACE: Every time your token lands on or passes GO, the Bank pays you 200 ₩!\n\n"
+        "JAIL: You go to Jail if you land on Go to Jail, draw a Go to Jail card, or roll 3 doubles in a row.\n"
+        "While in Jail, you still collect rent and can build or trade. To get out: roll a double (up to 3 turns), use a Get Out of Jail Free card, or pay a 50 ₩ fine before rolling.",
+        "خانة الانطلاق: في كل مرة تمر بها أو تتوقف عليها يدفع لك البنك 200 ₩!\n\n"
+        "السجن: تذهب للسجن إذا توقفت على خانة اذهب إلى السجن، أو سحبت بطاقة السجن، أو رميت 3 أزواج متتالية.\n"
+        "للخروج من السجن: ارمِ نرداً مزدوجاً، أو استخدم بطاقة الخروج من السجن، أو ادفع كفالة 50 ₩.");
+
+    add("mono_rule_title_7", "ÉCHANGER", "TRADING", "المقايضة والتبادل");
+    add("mono_rule_body_7",
+        "Les joueurs peuvent conclure des échanges en cliquant sur ÉCHANGE en bas de l'écran.\n\n"
+        "Vous pouvez échanger des propriétés (sans bâtiments), de l'argent et des cartes Vous êtes libéré de prison.\n"
+        " - Sélectionnez ce que vous proposez dans votre colonne de biens.\n"
+        " - Sélectionnez ce que vous souhaitez obtenir chez votre adversaire.\n"
+        " - Définissez l'argent éventuel à transférer et cliquez sur PROPOSITION.",
+        "Players can make deals at any time on their turn by clicking TRADE at the bottom of the screen.\n\n"
+        "You can trade unimproved properties, cash, and Get Out of Jail Free cards.\n"
+        " - Select what you want to offer from your column.\n"
+        " - Select what you want in return from your opponent's column.\n"
+        " - Adjust any cash transfer and click PROPOSE.",
+        "يمكن للاعبين إبرام صفقات تبادل بالنقر على زر مقايضة أسفل الشاشة.\n\n"
+        "يمكنك مبادلة العقارات (غير المبنية) والأموال وبطاقات الخروج من السجن.\n"
+        " - اختر ما تعرضه من عمود ممتلكاتك وما تطلبه من عمود الخصم ثم انقر على اقتراح.");
+
+    add("mono_rule_title_8", "MAISONS & HÔTELS", "HOUSES & HOTELS", "المنازل والفنادق");
+    add("mono_rule_body_8",
+        "MAISONS : Quand vous possédez toutes les propriétés d'un groupe de couleur (sans hypothèque), cliquez sur CONSTRUIRE pour acheter des maisons à la Banque.\n"
+        "Règle de construction égale : vous devez construire uniformément (1 maison sur chaque terrain du groupe avant de passer à la 2e maison, jusqu'à 4 maisons par terrain).\n\n"
+        "HÔTELS : Quand vous avez 4 maisons sur chaque propriété d'un groupe, vous pouvez les améliorer en Hôtel ! La limite de la Banque est de 32 maisons et 12 hôtels.",
+        "HOUSES: When you own an entire color group (unmortgaged), click BUILD to buy houses from the Bank.\n"
+        "Even Building Rule: You must build evenly across the group (1 house on each property before building a 2nd house on any, up to 4 houses per property).\n\n"
+        "HOTELS: Once you have 4 houses on every property of a group, you can upgrade to a Hotel! Bank limit: 32 houses and 12 hotels.",
+        "المنازل: عندما تمتلك كافة عقارات مجموعة لونية كاملة، انقر على بناء لشراء المنازل من البنك.\n"
+        "قاعدة البناء المتساوي: يجب البناء بالتساوي على عقارات المجموعة (منزل على كل عقار قبل بناء المنزل الثاني، حتى 4 منازل).\n\n"
+        "الفنادق: بعد بناء 4 منازل على كل عقار في المجموعة، يمكنك ترقيتها إلى فندق! يمتلك البنك 32 منزلاً و12 فندقاً.");
+
+    add("mono_rule_title_9", "VENDRE & HYPOTHÈQUES", "SELLING & MORTGAGES", "البيع والرهن العقاري");
+    add("mono_rule_body_9",
+        "VENDRE DES BÂTIMENTS : La Banque rachète vos maisons et hôtels à la moitié de leur prix d'achat (de manière uniforme sur le groupe).\n\n"
+        "HYPOTHÈQUES : Vous manquez d'argent ? Cliquez sur HYPOTHÉQUER. La Banque vous avance la moitié de la valeur du terrain (tous les bâtiments du groupe doivent d'abord être vendus).\n"
+        "Pour lever l'hypothèque, cliquez sur LEVER L'HYPOTHÈQUE et remboursez l'hypothèque majorée de 10 % d'intérêts.",
+        "SELLING BUILDINGS: The Bank buys back houses and hotels at half their purchase price (evenly across the color group).\n\n"
+        "MORTGAGES: Short on cash? Click MORTGAGE. The Bank lends you half the property's value (all buildings in the color group must be sold first).\n"
+        "To unmortgage, click UNMORTGAGE and pay the mortgage value plus 10% interest.",
+        "بيع المباني: يشتري البنك المنازل والفنادق بنصف سعر شرائها بالتساوي.\n\n"
+        "الرهن العقاري: عند الحاجة للسيولة، انقر على رهن للحصول على نصف قيمة العقار من البنك (بشرط عدم وجود مباني في المجموعة).\n"
+        "لفك الرهن، انقر على فك الرهن وادفع قيمة الرهن مضافاً إليها 10% فائدة.");
+
+    add("mono_rule_title_10", "FAILLITE", "BANKRUPTCY", "الإفلاس ونهاية اللعبة");
+    add("mono_rule_body_10",
+        "FAILLITE :\n"
+        "Si vous devez plus d'argent que vous ne pouvez en réunir en vendant vos bâtiments, en hypothéquant vos propriétés ou en échangeant, vous êtes déclaré en faillite et éliminé de la partie !\n\n"
+        "Vos biens restants reviennent à votre créancier. Le dernier joueur en lice remporte la partie et devient le grand maître de Monopoly !",
+        "BANKRUPTCY:\n"
+        "If you owe more money than you can raise by selling buildings, mortgaging properties, or trading, you are declared bankrupt and eliminated!\n\n"
+        "Your remaining assets are turned over to your creditor. The last remaining solvent player wins the game!",
+        "الإفلاس:\n"
+        "إذا عجزت عن سداد ديونك حتى بعد بيع المباني ورهن العقارات، يُعلن إفلاسك وتخرج من اللعبة!\n\n"
+        "تنتقل ممتلكاتك المتبقية إلى الدائن، ويفوز باللعبة آخر لاعب صامد!");
 }
 
 QString LanguageManager::rulesCheckersHtml() const {
@@ -392,6 +834,40 @@ QString LanguageManager::rulesDotsAndBoxesHtml() const {
             "<p><b>2. Déroulement :</b> Les joueurs tracent à tour de rôle un segment (horizontal ou vertical) reliant deux points voisins non encore connectés.</p>"
             "<p><b>3. Fermeture de case :</b> Le joueur qui trace le quatrième côté fermant un carré capture cette case à sa couleur et marque 1 point. Le tour passe ensuite normalement au joueur adverse (aucun tour supplémentaire n'est accordé).</p>"
             "<p><b>4. Fin de partie :</b> La partie prend fin dès que tous les carrés de la grille sont fermés. Le joueur ayant conquis le plus de carrés est proclamé vainqueur.</p>"
+        );
+    }
+}
+
+QString LanguageManager::rulesMonopolyHtml() const {
+    if (m_currentLanguage == Language::Arabic) {
+        return QString::fromUtf8(
+            "<h2 style='color:#D4AF37;'>قواعد لعبة مونوبولي (Monopoly)</h2>"
+            "<p><b>1. الهدف:</b> جمع أكبر ثروة ممكنة وإفلاس جميع المنافسين عبر شراء وتطوير وتأجير العقارات.</p>"
+            "<p><b>2. رمي النرد والحركة:</b> يبدأ كل دور برمي النردين. إذا حصلت على نرد مزدوج (Double) تلعب دوراً إضافياً، ولكن 3 أزواج متتالية ترسلك فوراً إلى السجن. عند المرور بخانة الانطلاق تحصل على 200 ₩.</p>"
+            "<p><b>3. الشراء والمزاد العلني:</b> عند التوقف على عقار غير مملوك، يمكنك شراؤه بالسعر المعلن أو طرحه في مزاد علني يشارك فيه كافة اللاعبين.</p>"
+            "<p><b>4. الإيجار والمجموعات اللونية:</b> يتضاعف إيجار الأراضي الفارغة إذا امتلك المالك جميع عقارات المجموعة اللونية الكاملة. لا يُدفع إيجار عن العقارات المرهونة.</p>"
+            "<p><b>5. المنازل والفنادق:</b> عند امتلاك مجموعة لونية كاملة، يمكنك بناء المنازل بالتساوي (حتى 4 منازل لكل عقار) ثم ترقيتها إلى فندق.</p>"
+            "<p><b>6. المقايضة والرهن والإفلاس:</b> يمكنك مقايضة العقارات والأموال وبطاقات الخروج من السجن مع اللاعبين الآخرين، أو رهن العقارات لدى البنك مقابل نصف قيمتها. اللاعب الذي يعجز عن سداد ديونه يعلن إفلاسه.</p>"
+        );
+    } else if (m_currentLanguage == Language::English) {
+        return QString::fromUtf8(
+            "<h2 style='color:#D4AF37;'>Monopoly Rules</h2>"
+            "<p><b>1. Goal:</b> Earn the greatest fortune and bankrupt your opponents by buying, developing, and trading properties.</p>"
+            "<p><b>2. Rolling & Moving:</b> Roll two dice to move around the board. Rolling doubles grants an extra turn, but 3 consecutive doubles send you straight to Jail! Collect 200 ₩ every time you pass GO.</p>"
+            "<p><b>3. Buying & Auctions:</b> Land on an unowned property to buy it at face value or put it up for auction where all players bid.</p>"
+            "<p><b>4. Rent & Color Monopolies:</b> Owning all properties in a color group doubles the rent on unimproved lots and unlocks house construction. No rent is collected on mortgaged properties.</p>"
+            "<p><b>5. Houses & Hotels:</b> Build houses evenly across a completed color group (up to 4 per property), then upgrade 4 houses into a Hotel.</p>"
+            "<p><b>6. Trading, Mortgages & Bankruptcy:</b> Trade properties, cash, and Get Out of Jail Free cards with other players, or mortgage properties to the Bank for half their price. A player who cannot pay their debts declares bankruptcy.</p>"
+        );
+    } else {
+        return QString::fromUtf8(
+            "<h2 style='color:#D4AF37;'>Règles du Monopoly</h2>"
+            "<p><b>1. But du jeu :</b> Remporter le plus d'argent possible et mener vos adversaires à la faillite en achetant, construisant et négociant des propriétés.</p>"
+            "<p><b>2. Lancer les dés & Case Départ :</b> Lancez les deux dés pour avancer. Un double vous permet de rejouer, mais 3 doubles consécutifs vous envoient directement en prison ! Recevez 200 ₩ à chaque passage par la case Départ.</p>"
+            "<p><b>3. Achat & Enchères :</b> Sur une propriété libre, cliquez sur ACHETER au prix indiqué ou lancez une ENCHÈRE ouverte à tous les joueurs.</p>"
+            "<p><b>4. Loyers & Groupes de couleur :</b> Posséder toutes les propriétés d'un même groupe de couleur double le loyer des terrains nus et permet de construire. Aucun loyer n'est dû sur une propriété hypothéquée.</p>"
+            "<p><b>5. Maisons & Hôtels :</b> Construisez uniformément jusqu'à 4 maisons par terrain d'un groupe complet, puis améliorez-les en Hôtel (limite de la Banque : 32 maisons et 12 hôtels).</p>"
+            "<p><b>6. Échanges, Hypothèques & Faillite :</b> Échangez terrains, argent et cartes Libéré de prison, ou hypothéquez vos biens pour la moitié de leur valeur. Tout joueur incapable de rembourser ses dettes est déclaré en faillite.</p>"
         );
     }
 }
