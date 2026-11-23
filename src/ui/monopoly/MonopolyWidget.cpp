@@ -24,6 +24,16 @@ MonopolyWidget::MonopolyWidget(QWidget *parent)
     m_setups[0] = {"", TokenType::Dog, false, AIDifficulty::Easy};
     m_setups[1] = {"", TokenType::Battleship, true, AIDifficulty::Easy};
 
+    // Load 3D golden token figurines
+    for (int i = 0; i < 8; ++i) {
+        QString resPath = QString(":/img/token_%1.png").arg(i);
+        QPixmap px(resPath);
+        if (px.isNull()) {
+            px.load(QString("img/token_%1.png").arg(i));
+        }
+        m_tokenPixmaps[i] = px;
+    }
+
     m_animTimer = new QTimer(this);
     m_animTimer->setInterval(16); // ~60 FPS
     connect(m_animTimer, &QTimer::timeout, this, &MonopolyWidget::onAnimTick);
@@ -296,12 +306,12 @@ void MonopolyWidget::onGameClockTick() {
 void MonopolyWidget::onAnimTick() {
     bool needsRepaint = false;
 
-    // 1. Dice roll animation
+    // 1. Dice roll animation (halved speed: 0.018 per tick)
     if (m_diceAnimActive) {
-        m_diceAnimProgress += 0.036;
-        // Cycle faces rapidly while tumbling
+        m_diceAnimProgress += 0.018;
+        // Cycle faces while tumbling
         if (m_diceAnimProgress < 0.82) {
-            int tick = static_cast<int>(m_diceAnimProgress * 50.0);
+            int tick = static_cast<int>(m_diceAnimProgress * 32.0);
             m_animDieFace1 = (tick % 6) + 1;
             m_animDieFace2 = ((tick * 3 + 2) % 6) + 1;
         } else if (m_game) {
@@ -319,15 +329,16 @@ void MonopolyWidget::onAnimTick() {
                 processRecentMoneyTransfers();
                 if (m_game && m_game->phase() == TurnPhase::CardModal) {
                     triggerFlyingCard(m_game->drawnCard().isChance);
+                } else {
+                    scheduleAIIfNeeded();
                 }
-                scheduleAIIfNeeded(450);
             }
         }
     }
 
-    // 2. Token movement animation (step-by-step around the board)
+    // 2. Token movement animation (halved speed: 0.08 per tile, 0.022 for jail flight)
     if (m_tokenAnimActive) {
-        double speed = m_tokenAnimIsJailFlight ? 0.045 : 0.16;
+        double speed = m_tokenAnimIsJailFlight ? 0.022 : 0.08;
         m_tokenAnimStepProgress += speed;
         needsRepaint = true;
 
@@ -339,25 +350,27 @@ void MonopolyWidget::onAnimTick() {
                 processRecentMoneyTransfers();
                 if (m_game && m_game->phase() == TurnPhase::CardModal) {
                     triggerFlyingCard(m_game->drawnCard().isChance);
+                } else {
+                    scheduleAIIfNeeded();
                 }
-                scheduleAIIfNeeded(450);
             }
         }
     }
 
-    // 3. Card flip / fly animation
+    // 3. Card flip / fly animation (halved speed: 0.027 per tick)
     if (m_cardAnim.active) {
-        m_cardAnim.progress += 0.055;
+        m_cardAnim.progress += 0.027;
         needsRepaint = true;
         if (m_cardAnim.progress >= 1.0) {
             m_cardAnim.progress = 1.0;
             m_cardAnim.active = false;
+            scheduleAIIfNeeded();
         }
     }
 
-    // 4. Floating money animations
+    // 4. Floating money animations (halved speed: 0.0125 per tick)
     for (auto it = m_moneyAnims.begin(); it != m_moneyAnims.end(); ) {
-        it->progress += 0.025;
+        it->progress += 0.0125;
         needsRepaint = true;
         if (it->progress >= 1.0) {
             it = m_moneyAnims.erase(it);
@@ -375,7 +388,7 @@ void MonopolyWidget::onAnimTick() {
             double target = m_game->player(i).money;
             double diff = target - m_displayedMoney[i];
             if (std::abs(diff) > 0.5) {
-                m_displayedMoney[i] += diff * 0.18;
+                m_displayedMoney[i] += diff * 0.10;
                 if (std::abs(target - m_displayedMoney[i]) < 1.0) {
                     m_displayedMoney[i] = target;
                 }
@@ -387,6 +400,30 @@ void MonopolyWidget::onAnimTick() {
     if (needsRepaint) {
         update();
     }
+}
+
+bool MonopolyWidget::isAnimating() const {
+    return m_diceAnimActive || m_tokenAnimActive || m_cardAnim.active;
+}
+
+void MonopolyWidget::skipActiveAnimations() {
+    if (!isAnimating()) return;
+    m_diceAnimActive = false;
+    m_diceAnimProgress = 1.0;
+    m_tokenAnimActive = false;
+    m_cardAnim.active = false;
+    m_cardAnim.progress = 1.0;
+    m_moneyAnims.clear();
+
+    if (m_game) {
+        m_game->clearRecentTransfers();
+        m_displayedMoney.resize(m_game->numPlayers(), 1500.0);
+        for (int i = 0; i < m_game->numPlayers(); ++i) {
+            m_displayedMoney[i] = m_game->player(i).money;
+        }
+    }
+    scheduleAIIfNeeded();
+    update();
 }
 
 void MonopolyWidget::triggerRollAndMoveAnimation() {
@@ -461,22 +498,34 @@ void MonopolyWidget::triggerDeedFlyToPlayer(int spaceIndex, int playerId) {
 // -----------------------------------------------------------------------------
 void MonopolyWidget::scheduleAIIfNeeded(int delayMs) {
     if (!m_game || !m_ai || m_screen != ViewScreen::InGame) return;
-    if (m_diceAnimActive || m_tokenAnimActive) return;
+    if (m_diceAnimActive || m_tokenAnimActive || m_cardAnim.active) return;
 
     if (m_game->phase() == TurnPhase::WaitingForStartModal) {
         return; // Let human click FERMER on the initial start banner
     }
 
-    if (m_game->isAITurn() && !m_aiStepPending) {
+    if (m_game->isAITurn()) {
+        int effectiveDelay = delayMs;
+        if (effectiveDelay < 0) {
+            switch (m_game->phase()) {
+                case TurnPhase::CardModal:        effectiveDelay = 3600; break;
+                case TurnPhase::RentPaymentModal: effectiveDelay = 2600; break;
+                case TurnPhase::BuyOrAuction:     effectiveDelay = 2400; break;
+                case TurnPhase::Auction:          effectiveDelay = 1600; break;
+                case TurnPhase::WaitingForRoll:   effectiveDelay = 1500; break;
+                case TurnPhase::WaitingForEndTurn:effectiveDelay = 1800; break;
+                default:                          effectiveDelay = 1800; break;
+            }
+        }
         m_aiStepPending = true;
-        m_aiTimer->start(delayMs);
+        m_aiTimer->start(effectiveDelay);
     }
 }
 
 void MonopolyWidget::onAIStep() {
     m_aiStepPending = false;
     if (!m_game || !m_ai || m_screen != ViewScreen::InGame) return;
-    if (m_diceAnimActive || m_tokenAnimActive) return;
+    if (m_diceAnimActive || m_tokenAnimActive || m_cardAnim.active) return;
     if (!m_game->isAITurn()) return;
 
     int actorId = m_game->activeActorId();
@@ -504,17 +553,16 @@ void MonopolyWidget::onAIStep() {
                 m_game->buyCurrentProperty();
                 processRecentMoneyTransfers();
                 triggerDeedFlyToPlayer(pos, actorId);
-                scheduleAIIfNeeded(650);
+                scheduleAIIfNeeded(1800);
             } else {
                 m_game->startAuctionForCurrentProperty();
-                scheduleAIIfNeeded(500);
+                scheduleAIIfNeeded(1600);
             }
             break;
         }
 
         case TurnPhase::Auction: {
             int bid = m_ai->chooseAuctionBid(*m_game, actorId);
-            int prevWinner = m_game->auctionState().highestBidderId;
             int propIdx = m_game->auctionState().spaceIndex;
             if (bid > 0) {
                 m_game->placeAuctionBid(actorId, bid);
@@ -527,16 +575,15 @@ void MonopolyWidget::onAIStep() {
                 if (finalWinner >= 0) {
                     triggerDeedFlyToPlayer(propIdx, finalWinner);
                 }
-                (void)prevWinner;
             }
-            scheduleAIIfNeeded(480);
+            scheduleAIIfNeeded(1600);
             break;
         }
 
         case TurnPhase::RentPaymentModal: {
             m_game->dismissRentModal();
             processRecentMoneyTransfers();
-            scheduleAIIfNeeded(550);
+            scheduleAIIfNeeded(1800);
             break;
         }
 
@@ -548,7 +595,7 @@ void MonopolyWidget::onAIStep() {
                 startMovePathAnimation(m_game->lastMovePath(), m_game->lastMoveWasJailSend());
             } else {
                 processRecentMoneyTransfers();
-                scheduleAIIfNeeded(550);
+                scheduleAIIfNeeded(1800);
             }
             break;
         }
@@ -556,7 +603,7 @@ void MonopolyWidget::onAIStep() {
         case TurnPhase::DebtResolution: {
             m_ai->resolveDebt(*m_game, actorId);
             processRecentMoneyTransfers();
-            scheduleAIIfNeeded(550);
+            scheduleAIIfNeeded(1800);
             break;
         }
 
@@ -568,7 +615,7 @@ void MonopolyWidget::onAIStep() {
             } else {
                 m_game->endTurn();
                 m_expandedPlayerId = m_game->activePlayerIndex();
-                scheduleAIIfNeeded(500);
+                scheduleAIIfNeeded(1500);
             }
             break;
         }
@@ -726,112 +773,6 @@ void MonopolyWidget::paintModalFrame(QPainter& p, const QRectF& rect, const QStr
     p.restore();
 }
 
-void MonopolyWidget::paintParisSkyline(QPainter& p, const QRectF& skyRect,
-                                       const QColor& goldLight, const QColor& goldDark) {
-    p.save();
-    QLinearGradient grad(skyRect.topLeft(), skyRect.bottomLeft());
-    grad.setColorAt(0.0, goldLight);
-    grad.setColorAt(0.55, QColor("#D4AF37"));
-    grad.setColorAt(1.0, goldDark);
-
-    p.setPen(QPen(goldLight, 1.0));
-    p.setBrush(grad);
-
-    double bY = skyRect.bottom();
-    double w = skyRect.width();
-    double h = skyRect.height();
-    double lX = skyRect.left();
-
-    QPainterPath path;
-    // Base ground plinth
-    path.addRect(lX, bY - 4, w, 4);
-
-    // 1. Left column monument (Colonne Vendôme / Bastille)
-    double c1X = lX + w * 0.07;
-    path.addRect(c1X - w * 0.015, bY - h * 0.45, w * 0.03, h * 0.45);
-    path.addRect(c1X - w * 0.022, bY - h * 0.48, w * 0.044, h * 0.03);
-    path.addEllipse(QPointF(c1X, bY - h * 0.52), w * 0.012, h * 0.04);
-
-    // 2. Moulin Rouge windmill
-    double mX = lX + w * 0.17;
-    QPainterPath mill;
-    mill.moveTo(mX - w * 0.035, bY);
-    mill.lineTo(mX - w * 0.022, bY - h * 0.25);
-    mill.lineTo(mX, bY - h * 0.31);
-    mill.lineTo(mX + w * 0.022, bY - h * 0.25);
-    mill.lineTo(mX + w * 0.035, bY);
-    mill.closeSubpath();
-    path.addPath(mill);
-
-    // 3. Opéra Garnier dome & facade
-    double opX = lX + w * 0.32;
-    path.addRect(opX - w * 0.09, bY - h * 0.26, w * 0.18, h * 0.26);
-    path.addEllipse(QPointF(opX, bY - h * 0.26), w * 0.055, h * 0.12);
-
-    // 4. Centerpiece: Tour Eiffel!
-    double eX = lX + w * 0.50;
-    double eTop = bY - h * 0.96;
-    QPainterPath eiffel;
-    // Outer silhouette
-    eiffel.moveTo(eX - w * 0.085, bY);
-    eiffel.quadTo(eX - w * 0.035, bY - h * 0.40, eX - w * 0.012, eTop + h * 0.08);
-    eiffel.lineTo(eX - w * 0.004, eTop);
-    eiffel.lineTo(eX + w * 0.004, eTop);
-    eiffel.lineTo(eX + w * 0.012, eTop + h * 0.08);
-    eiffel.quadTo(eX + w * 0.035, bY - h * 0.40, eX + w * 0.085, bY);
-    // Inner base arch cutout
-    eiffel.lineTo(eX + w * 0.048, bY);
-    eiffel.cubicTo(eX + w * 0.042, bY - h * 0.22, eX - w * 0.042, bY - h * 0.22, eX - w * 0.048, bY);
-    eiffel.closeSubpath();
-    path.addPath(eiffel);
-    // Eiffel observation decks
-    path.addRect(eX - w * 0.055, bY - h * 0.28, w * 0.11, h * 0.035);
-    path.addRect(eX - w * 0.036, bY - h * 0.54, w * 0.072, h * 0.03);
-
-    // 5. Sacré-Cœur Basilica domes
-    double scX = lX + w * 0.65;
-    path.addRect(scX - w * 0.055, bY - h * 0.28, w * 0.11, h * 0.28);
-    path.addEllipse(QPointF(scX, bY - h * 0.30), w * 0.03, h * 0.16);
-    path.addEllipse(QPointF(scX - w * 0.036, bY - h * 0.26), w * 0.016, h * 0.10);
-    path.addEllipse(QPointF(scX + w * 0.036, bY - h * 0.26), w * 0.016, h * 0.10);
-
-    // 6. Arc de Triomphe
-    double arcX = lX + w * 0.79;
-    QPainterPath arc;
-    arc.moveTo(arcX - w * 0.06, bY);
-    arc.lineTo(arcX - w * 0.06, bY - h * 0.36);
-    arc.lineTo(arcX + w * 0.06, bY - h * 0.36);
-    arc.lineTo(arcX + w * 0.06, bY);
-    arc.lineTo(arcX + w * 0.025, bY);
-    arc.lineTo(arcX + w * 0.025, bY - h * 0.18);
-    arc.cubicTo(arcX + w * 0.025, bY - h * 0.25, arcX - w * 0.025, bY - h * 0.25, arcX - w * 0.025, bY - h * 0.18);
-    arc.lineTo(arcX - w * 0.025, bY);
-    arc.closeSubpath();
-    path.addPath(arc);
-
-    // 7. Obélisque de la Concorde & Notre-Dame towers on right
-    double obX = lX + w * 0.91;
-    QPainterPath ob;
-    ob.moveTo(obX - w * 0.012, bY);
-    ob.lineTo(obX - w * 0.006, bY - h * 0.52);
-    ob.lineTo(obX, bY - h * 0.57);
-    ob.lineTo(obX + w * 0.006, bY - h * 0.52);
-    ob.lineTo(obX + w * 0.012, bY);
-    ob.closeSubpath();
-    path.addPath(ob);
-
-    p.drawPath(path);
-
-    // Draw Windmill blades on Moulin Rouge
-    p.setPen(QPen(goldLight, 1.8));
-    QPointF mCenter(mX, bY - h * 0.25);
-    double bladeR = std::min(w, h) * 0.11;
-    p.drawLine(mCenter + QPointF(-bladeR, -bladeR), mCenter + QPointF(bladeR, bladeR));
-    p.drawLine(mCenter + QPointF(-bladeR, bladeR), mCenter + QPointF(bladeR, -bladeR));
-
-    p.restore();
-}
-
 void MonopolyWidget::paintTokenIcon(QPainter& p, const QRectF& rect, TokenType token, bool withBox) {
     p.save();
 
@@ -851,133 +792,24 @@ void MonopolyWidget::paintTokenIcon(QPainter& p, const QRectF& rect, TokenType t
         p.drawRoundedRect(rect, 7.0, 7.0);
     }
 
-    QRectF r = withBox ? rect.adjusted(6, 6, -6, -6) : rect;
+    QRectF r = withBox ? rect.adjusted(4, 4, -4, -4) : rect;
+    int tokIdx = std::clamp(static_cast<int>(token), 0, 7);
+    const QPixmap& px = m_tokenPixmaps[tokIdx];
 
-    // 3D Metallic Gold Gradient for tokens (matching the golden Mega tokens photo!)
-    QLinearGradient goldGrad(r.topLeft(), r.bottomRight());
-    goldGrad.setColorAt(0.0, QColor("#FFF4C2"));
-    goldGrad.setColorAt(0.35, QColor("#E6C34A"));
-    goldGrad.setColorAt(0.7, QColor("#C59B27"));
-    goldGrad.setColorAt(1.0, QColor("#7D5D0B"));
-
-    p.setPen(QPen(QColor("#523B04"), 1.3));
-    p.setBrush(goldGrad);
-
-    double x = r.left(), y = r.top(), w = r.width(), h = r.height();
-    QPainterPath path;
-
-    switch (token) {
-        case TokenType::Racecar: {
-            // Classic vintage Grand Prix racecar silhouette
-            path.moveTo(x + w * 0.08, y + h * 0.65);
-            path.quadTo(x + w * 0.12, y + h * 0.40, x + w * 0.35, y + h * 0.42);
-            path.lineTo(x + w * 0.45, y + h * 0.28);
-            path.lineTo(x + w * 0.56, y + h * 0.42);
-            path.quadTo(x + w * 0.85, y + h * 0.42, x + w * 0.94, y + h * 0.62);
-            path.lineTo(x + w * 0.92, y + h * 0.72);
-            path.lineTo(x + w * 0.08, y + h * 0.72);
-            path.closeSubpath();
-            p.drawPath(path);
-            // Wheels
-            p.setBrush(QColor("#27272A"));
-            p.setPen(QPen(QColor("#F3E5AB"), 1.5));
-            p.drawEllipse(QPointF(x + w * 0.24, y + h * 0.72), w * 0.13, w * 0.13);
-            p.drawEllipse(QPointF(x + w * 0.76, y + h * 0.72), w * 0.13, w * 0.13);
-            break;
-        }
-        case TokenType::Battleship: {
-            // Naval battleship hull + superstructure + turrets
-            path.moveTo(x + w * 0.06, y + h * 0.58);
-            path.lineTo(x + w * 0.94, y + h * 0.52);
-            path.lineTo(x + w * 0.84, y + h * 0.76);
-            path.lineTo(x + w * 0.14, y + h * 0.76);
-            path.closeSubpath();
-            path.addRect(x + w * 0.32, y + h * 0.38, w * 0.32, h * 0.18);
-            path.addRect(x + w * 0.40, y + h * 0.22, w * 0.08, h * 0.16);
-            path.addRect(x + w * 0.52, y + h * 0.25, w * 0.07, h * 0.13);
-            p.drawPath(path);
-            break;
-        }
-        case TokenType::TopHat: {
-            // Gentleman's Top Hat
-            p.drawEllipse(QRectF(x + w * 0.08, y + h * 0.60, w * 0.84, h * 0.24));
-            QPainterPath crown;
-            crown.moveTo(x + w * 0.24, y + h * 0.68);
-            crown.lineTo(x + w * 0.20, y + h * 0.22);
-            crown.quadTo(x + w * 0.50, y + h * 0.14, x + w * 0.80, y + h * 0.22);
-            crown.lineTo(x + w * 0.76, y + h * 0.68);
-            crown.closeSubpath();
-            p.drawPath(crown);
-            // Ribbon
-            p.setBrush(QColor("#8A6608"));
-            p.drawRect(QRectF(x + w * 0.23, y + h * 0.56, w * 0.54, h * 0.09));
-            break;
-        }
-        case TokenType::Dog: {
-            // Scottie Dog silhouette
-            path.moveTo(x + w * 0.22, y + h * 0.82);
-            path.lineTo(x + w * 0.22, y + h * 0.48);
-            path.lineTo(x + w * 0.10, y + h * 0.44);
-            path.lineTo(x + w * 0.12, y + h * 0.32);
-            path.lineTo(x + w * 0.26, y + h * 0.16); // Ear
-            path.lineTo(x + w * 0.36, y + h * 0.28);
-            path.lineTo(x + w * 0.38, y + h * 0.44); // Neck
-            path.lineTo(x + w * 0.74, y + h * 0.44); // Back
-            path.lineTo(x + w * 0.86, y + h * 0.24); // Tail
-            path.lineTo(x + w * 0.88, y + h * 0.48);
-            path.lineTo(x + w * 0.80, y + h * 0.82); // Back leg
-            path.lineTo(x + w * 0.66, y + h * 0.82);
-            path.lineTo(x + w * 0.64, y + h * 0.66);
-            path.lineTo(x + w * 0.38, y + h * 0.66);
-            path.lineTo(x + w * 0.36, y + h * 0.82);
-            path.closeSubpath();
-            p.drawPath(path);
-            break;
-        }
-        case TokenType::Boot: {
-            // Classic Monopoly Ankle Boot
-            path.moveTo(x + w * 0.48, y + h * 0.16);
-            path.lineTo(x + w * 0.78, y + h * 0.18);
-            path.lineTo(x + w * 0.74, y + h * 0.78);
-            path.lineTo(x + w * 0.14, y + h * 0.78);
-            path.quadTo(x + w * 0.12, y + h * 0.60, x + w * 0.44, y + h * 0.52);
-            path.closeSubpath();
-            p.drawPath(path);
-            break;
-        }
-        case TokenType::Cat: {
-            // Cat with raised tail
-            path.addEllipse(QRectF(x + w * 0.20, y + h * 0.24, w * 0.24, h * 0.22)); // Head
-            path.addEllipse(QRectF(x + w * 0.32, y + h * 0.42, w * 0.44, h * 0.30)); // Body
-            path.moveTo(x + w * 0.72, y + h * 0.48);
-            path.quadTo(x + w * 0.90, y + h * 0.20, x + w * 0.78, y + h * 0.14); // Tail
-            p.drawPath(path);
-            break;
-        }
-        case TokenType::Thimble: {
-            // Sewing Thimble
-            path.moveTo(x + w * 0.22, y + h * 0.80);
-            path.lineTo(x + w * 0.30, y + h * 0.26);
-            path.quadTo(x + w * 0.50, y + h * 0.12, x + w * 0.70, y + h * 0.26);
-            path.lineTo(x + w * 0.78, y + h * 0.80);
-            path.closeSubpath();
-            p.drawPath(path);
-            break;
-        }
-        case TokenType::Wheelbarrow: {
-            // Wheelbarrow
-            path.moveTo(x + w * 0.22, y + h * 0.38);
-            path.lineTo(x + w * 0.74, y + h * 0.38);
-            path.lineTo(x + w * 0.62, y + h * 0.64);
-            path.lineTo(x + w * 0.28, y + h * 0.64);
-            path.closeSubpath();
-            p.drawPath(path);
-            p.drawLine(QPointF(x + w * 0.62, y + h * 0.52), QPointF(x + w * 0.92, y + h * 0.44));
-            p.drawEllipse(QPointF(x + w * 0.20, y + h * 0.70), w * 0.11, w * 0.11);
-            break;
-        }
+    if (!px.isNull()) {
+        p.drawPixmap(r.toRect(), px);
+        p.restore();
+        return;
     }
 
+    // Fallback vector drawing if pixmap not loaded
+    QLinearGradient goldGrad(r.topLeft(), r.bottomRight());
+    goldGrad.setColorAt(0.0, QColor("#FFF4C2"));
+    goldGrad.setColorAt(0.5, QColor("#D4AF37"));
+    goldGrad.setColorAt(1.0, QColor("#7D5D0B"));
+    p.setPen(QPen(QColor("#523B04"), 1.3));
+    p.setBrush(goldGrad);
+    p.drawEllipse(r);
     p.restore();
 }
 
@@ -1262,12 +1094,6 @@ void MonopolyWidget::paintLobbySetup(QPainter& p) {
     p.setPen(QPen(QColor("#D4AF37"), 2.5));
     p.setBrush(Qt::NoBrush);
     p.drawRoundedRect(full.adjusted(4, 4, -4, -4), 10, 10);
-
-    // Golden Paris Skyline Silhouette across the background above the bottom bar
-    QRectF skyRect(full.left() + 40, full.bottom() - 250, full.width() - 80, 175);
-    paintParisSkyline(p, skyRect,
-                      m_isDarkMode ? QColor(212, 175, 55, 65) : QColor(197, 155, 39, 75),
-                      m_isDarkMode ? QColor(138, 102, 8, 30) : QColor(138, 102, 8, 40));
 
     // Top Header Stripe + MONOPOLY Gold Logo Box
     QRectF topStripe(full.left() + 6, full.top() + 18, full.width() - 12, 26);
@@ -1657,15 +1483,6 @@ void MonopolyWidget::paintBoardCenter(QPainter& p, const QRectF& cRect) {
     paintChestIcon(p, QRectF(chestSlot.center().x() - 22, chestSlot.center().y() - 22, 44, 44));
     paintQuestionIcon(p, QRectF(chanceSlot.center().x() - 22, chanceSlot.center().y() - 26, 44, 52), QColor("#D4AF37"));
 
-    // 4. Golden Paris Skyline Silhouette across the lower board center!
-    QRectF skyRect(cRect.left() + cRect.width() * 0.12,
-                   cRect.bottom() - cRect.height() * 0.42,
-                   cRect.width() * 0.76,
-                   cRect.height() * 0.36);
-    paintParisSkyline(p, skyRect,
-                      m_isDarkMode ? QColor("#F3E5AB") : QColor("#D4AF37"),
-                      m_isDarkMode ? QColor("#8A6608") : QColor("#9A740A"));
-
     p.restore();
 }
 
@@ -1964,40 +1781,33 @@ void MonopolyWidget::paintTokensOnBoard(QPainter& p) {
             double t = m_tokenAnimStepProgress;
             pos = pA * (1.0 - t) + pB * t;
             // Parabolic hop arc!
-            double arcHeight = m_tokenAnimIsJailFlight ? 55.0 : 16.0;
+            double arcHeight = m_tokenAnimIsJailFlight ? 55.0 : 18.0;
             jumpOffset = 4.0 * t * (1.0 - t) * arcHeight;
         } else {
             QRectF sr = spaceRect(pl.position);
             // Offset multiple tokens on the same space so all are clearly visible
             static const QPointF offsets[4] = {
-                QPointF(-0.18, -0.15),
-                QPointF(0.18, -0.15),
-                QPointF(-0.18, 0.18),
-                QPointF(0.18, 0.18)
+                QPointF(-0.17, -0.14),
+                QPointF(0.17, -0.14),
+                QPointF(-0.17, 0.17),
+                QPointF(0.17, 0.17)
             };
             pos = sr.center() + QPointF(sr.width() * offsets[i % 4].x(), sr.height() * offsets[i % 4].y());
         }
 
-        double tokR = std::max(13.0, boardOuterRect().width() * 0.023);
+        // Size of the 3D figurine standing directly on the board (no circular badge!)
+        double tokRadius = std::max(21.0, boardOuterRect().width() * 0.036);
 
-        // Ground shadow under token
+        // Soft 3D cast shadow on the board under the figurine
         p.save();
         p.setPen(Qt::NoPen);
-        p.setBrush(QColor(0, 0, 0, 130));
-        p.drawEllipse(pos + QPointF(0, 4), tokR * 0.85, tokR * 0.45);
+        p.setBrush(QColor(0, 0, 0, m_isDarkMode ? 160 : 110));
+        p.drawEllipse(pos + QPointF(2, tokRadius * 0.45), tokRadius * 0.78, tokRadius * 0.34);
 
-        // Token pedestal ring in player's accent color + Gold
+        // Draw 3D golden figurine directly on the board without any circle around it!
         QPointF drawCenter = pos - QPointF(0, jumpOffset);
-        QRectF badgeRect(drawCenter.x() - tokR, drawCenter.y() - tokR, tokR * 2.0, tokR * 2.0);
-
-        QRadialGradient pedGrad(drawCenter, tokR);
-        pedGrad.setColorAt(0.0, m_isDarkMode ? QColor("#282316") : QColor("#FFFDF5"));
-        pedGrad.setColorAt(1.0, m_isDarkMode ? QColor("#12100B") : QColor("#EAE0C0"));
-        p.setPen(QPen(playerAccentColor(i), 2.2));
-        p.setBrush(pedGrad);
-        p.drawEllipse(badgeRect);
-
-        paintTokenIcon(p, badgeRect.adjusted(2, 2, -2, -2), pl.token, false);
+        QRectF figRect(drawCenter.x() - tokRadius, drawCenter.y() - tokRadius, tokRadius * 2.0, tokRadius * 2.0);
+        paintTokenIcon(p, figRect, pl.token, false);
         p.restore();
     }
 }
@@ -2716,7 +2526,7 @@ void MonopolyWidget::paintCenterTurnModals(QPainter& p, const QRectF& cRect) {
         p.drawPolygon(arr);
 
         QRectF okBtn(mRect.center().x() - 52, mRect.bottom() - 38, 104, 28);
-        paintGoldButton(p, "modal_rent_close", okBtn, trText("mono_close_btn"), !actP.isAI, true, 12);
+        paintGoldButton(p, "modal_rent_close", okBtn, trText("mono_close_btn"), true, true, 12);
     }
     else if (ph == TurnPhase::CardModal && !m_cardAnim.active) {
         // Replicating monopoly-mega-paris...(6).jpg & 182238.png: Black & Gold / White & Gold Chance & Community Chest card!
@@ -2756,7 +2566,7 @@ void MonopolyWidget::paintCenterTurnModals(QPainter& p, const QRectF& cRect) {
                    trText(QString::fromStdString(c.textKey)));
 
         QRectF okBtn(cardR.center().x() - 55, cardR.bottom() - 44, 110, 32);
-        paintGoldButton(p, "modal_card_close", okBtn, trText("mono_close_btn"), !actP.isAI, true, 12);
+        paintGoldButton(p, "modal_card_close", okBtn, trText("mono_close_btn"), true, true, 12);
     }
     else if (ph == TurnPhase::DebtResolution) {
         QRectF mRect(cRect.center().x() - 165, cRect.center().y() - 95, 330, 190);
@@ -3270,6 +3080,12 @@ void MonopolyWidget::mousePressEvent(QMouseEvent *event) {
     if (event->button() != Qt::LeftButton) return;
     QPointF pos = event->pos();
 
+    // If an animation (dice roll, token hop, or card flip) is playing and the user clicks on the board, skip it immediately!
+    if (m_screen == ViewScreen::InGame && isAnimating() && boardOuterRect().contains(pos)) {
+        skipActiveAnimations();
+        return;
+    }
+
     // 1. Check registered interactive buttons (reverse order so top overlays take precedence)
     for (auto it = m_buttons.rbegin(); it != m_buttons.rend(); ++it) {
         if (it->enabled && it->rect.contains(pos)) {
@@ -3680,13 +3496,18 @@ void MonopolyWidget::handleButtonClick(const QString& id) {
         return;
     }
     if (id == "modal_rent_close") {
+        m_aiTimer->stop();
+        m_aiStepPending = false;
         m_game->dismissRentModal();
         processRecentMoneyTransfers();
+        scheduleAIIfNeeded();
         emit gameStateUpdated();
         update();
         return;
     }
     if (id == "modal_card_close") {
+        m_aiTimer->stop();
+        m_aiStepPending = false;
         int prevPos = m_game->activePlayer().position;
         int actId = m_game->activePlayerIndex();
         m_game->dismissCardModal();
@@ -3695,6 +3516,7 @@ void MonopolyWidget::handleButtonClick(const QString& id) {
             startMovePathAnimation(m_game->lastMovePath(), m_game->lastMoveWasJailSend());
         } else {
             processRecentMoneyTransfers();
+            scheduleAIIfNeeded();
         }
         emit gameStateUpdated();
         update();

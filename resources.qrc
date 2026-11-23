@@ -11,6 +11,14 @@
         <file>img/nine_mens_morris.png</file>
         <file>img/dot_and_boxes.png</file>
         <file>img/monopoly.png</file>
+        <file>img/token_0.png</file>
+        <file>img/token_1.png</file>
+        <file>img/token_2.png</file>
+        <file>img/token_3.png</file>
+        <file>img/token_4.png</file>
+        <file>img/token_5.png</file>
+        <file>img/token_6.png</file>
+        <file>img/token_7.png</file>
     </qresource>
 </RCC>
 

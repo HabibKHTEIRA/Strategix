@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <QRectF>
 #include <QPointF>
+#include <QPixmap>
+#include <array>
 #include <vector>
 #include <string>
 #include "../../core/monopoly/MonopolyGame.h"
@@ -115,7 +117,6 @@ private:
     void paintInGame(QPainter& p);
     void paintBoard(QPainter& p, const QRectF& bRect);
     void paintBoardCenter(QPainter& p, const QRectF& cRect);
-    void paintParisSkyline(QPainter& p, const QRectF& skyRect, const QColor& goldLight, const QColor& goldDark);
     void paintSpaceTile(QPainter& p, int index, const QRectF& r);
     void paintCornerTile(QPainter& p, int index, const QRectF& r);
     void paintTokensOnBoard(QPainter& p);
@@ -144,12 +145,14 @@ private:
     void paintRingIcon(QPainter& p, const QRectF& rect);
 
     // Animation triggers
+    bool isAnimating() const;
+    void skipActiveAnimations();
     void triggerRollAndMoveAnimation();
     void startMovePathAnimation(const std::vector<int>& path, bool jailFlight);
     void processRecentMoneyTransfers();
     void triggerFlyingCard(bool isChance);
     void triggerDeedFlyToPlayer(int spaceIndex, int playerId);
-    void scheduleAIIfNeeded(int delayMs = 550);
+    void scheduleAIIfNeeded(int delayMs = -1);
 
     // Button interaction handling
     void handleButtonClick(const QString& id);
@@ -157,6 +160,7 @@ private:
     MonopolyGame *m_game = nullptr;
     MonopolyAI *m_ai = nullptr;
     bool m_isDarkMode = true;
+    std::array<QPixmap, 8> m_tokenPixmaps;
 
     ViewScreen m_screen = ViewScreen::LobbySetup;
     ActionOverlayMode m_overlayMode = ActionOverlayMode::None;
